@@ -1,0 +1,39 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node:*)",
+      "Bash(test:*)",
+      "Bash(pnpm --version:*)",
+      "Bash(docker:*)",
+      "Bash(docker compose:*)",
+      "Bash(pnpm install:*)",
+      "Bash(pnpm --filter @nexus/api prisma:generate:*)",
+      "Bash(pnpm --filter @nexus/api prisma:migrate:*)",
+      "Bash(set -a)",
+      "Bash(source .env)",
+      "Bash(set +a)",
+      "Bash(source:*)",
+      "Bash(pnpm --filter @nexus/api seed:*)",
+      "Bash(pnpm --filter @nexus/shared test:*)",
+      "Bash(pnpm --filter @nexus/api test)",
+      "Bash(pkill:*)",
+      "Bash(curl:*)",
+      "Bash(python3:*)",
+      "Bash(npx tsx:*)",
+      "Bash(pnpm --filter @nexus/api add:*)",
+      "Bash(__NEW_LINE_661fec75901708e1__ echo)",
+      "Bash(lsof:*)",
+      "Bash(pnpm add:*)",
+      "Bash(npx prisma migrate dev:*)",
+      "Bash(DATABASE_URL=postgresql://postgres:postgres@localhost:5432/nexusos npx prisma migrate dev:*)",
+      "Bash(pnpm build:*)",
+      "Bash(DATABASE_URL=postgresql://postgres:postgres@localhost:5432/nexusos npx prisma migrate diff:*)",
+      "Bash(pnpm --filter @nexus/api exec prisma generate:*)",
+      "Bash(pnpm --filter @nexus/contracts build:*)",
+      "Bash(pnpm --filter @nexus/shared build:*)",
+      "Bash(pnpm --filter @nexus/api build:*)",
+      "Bash(pnpm --filter @nexus/workers build:*)",
+      "Bash(pnpm --filter @nexus/web build:*)"
+    ]
+  }
+}

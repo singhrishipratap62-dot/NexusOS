@@ -1,0 +1,140 @@
+version: '3.9'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: nexusos
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - '5432:5432'
+    volumes:
+      - nexusos-postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres -d nexusos']
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - '6379:6379'
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    restart: unless-stopped
+
+  migrate-seed:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/nexusos
+      SINGLE_TENANT_ID: tenant_day1
+    command:
+      [
+        'sh',
+        '-lc',
+        'pnpm --filter @nexus/api prisma:migrate && pnpm --filter @nexus/api seed'
+      ]
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: 'no'
+
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    environment:
+      NODE_ENV: production
+      HOST: 0.0.0.0
+      PORT: 3000
+      SINGLE_TENANT_ID: tenant_day1
+      AUTH_STATIC_TOKEN: day1-mvp-token
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/nexusos
+      REDIS_URL: redis://redis:6379
+      BLENDED_HOURLY_RATE: 95
+      IMPLEMENTATION_COST_DEFAULT: 18000
+      ANNUAL_PLATFORM_COST: 4800
+      ENABLE_LLM_RATIONALE: false
+    ports:
+      - '3000:3000'
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      migrate-seed:
+        condition: service_completed_successfully
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          "fetch('http://127.0.0.1:3000/health',{headers:{authorization:'Bearer '+(process.env.AUTH_STATIC_TOKEN||'day1-mvp-token'),'x-tenant-id':(process.env.SINGLE_TENANT_ID||'tenant_day1'),'x-actor-id':'healthcheck'}}).then((response)=>process.exit(response.ok?0:1)).catch(()=>process.exit(1))"
+        ]
+      interval: 10s
+      timeout: 4s
+      retries: 20
+    restart: unless-stopped
+
+  workers:
+    build:
+      context: .
+      dockerfile: apps/workers/Dockerfile
+    environment:
+      NODE_ENV: production
+      SINGLE_TENANT_ID: tenant_day1
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/nexusos
+      REDIS_URL: redis://redis:6379
+      BLENDED_HOURLY_RATE: 95
+      IMPLEMENTATION_COST_DEFAULT: 18000
+      ANNUAL_PLATFORM_COST: 4800
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      migrate-seed:
+        condition: service_completed_successfully
+    restart: unless-stopped
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    environment:
+      NODE_ENV: production
+      WEB_PORT: 3001
+      API_BASE_URL: http://api:3000
+      NEXT_PUBLIC_API_BASE_URL: http://localhost:3000
+      SINGLE_TENANT_ID: tenant_day1
+      NEXT_PUBLIC_TENANT_ID: tenant_day1
+      AUTH_STATIC_TOKEN: day1-mvp-token
+    ports:
+      - '3001:3001'
+    depends_on:
+      api:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          "fetch('http://127.0.0.1:3001').then((response)=>process.exit(response.ok?0:1)).catch(()=>process.exit(1))"
+        ]
+      interval: 10s
+      timeout: 4s
+      retries: 20
+    restart: unless-stopped
+
+volumes:
+  nexusos-postgres:

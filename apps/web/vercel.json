@@ -1,0 +1,7 @@
+{
+  "framework": "nextjs",
+  "buildCommand": "pnpm --filter @nexus/web build",
+  "devCommand": "pnpm --filter @nexus/web dev",
+  "installCommand": "pnpm install",
+  "outputDirectory": ".next"
+}

@@ -1,0 +1,21 @@
+{
+  "name": "@nexus/shared",
+  "version": "0.1.0",
+  "private": true,
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "pretest": "pnpm --filter @nexus/contracts build",
+    "build": "tsc -p tsconfig.json",
+    "lint": "echo 'No lint configured for shared'",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@nexus/contracts": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  }
+}

@@ -1,0 +1,27 @@
+# Dependencies — reinstalled inside image via pnpm install
+node_modules
+**/node_modules
+
+# Build outputs — rebuilt inside image
+dist
+**/dist
+.next
+**/.next
+
+# Secrets — must never enter build context
+.env
+.env.local
+.env.*.local
+
+# Test artifacts
+coverage
+**/coverage
+
+# OS / editor noise
+.DS_Store
+*.log
+*.tmp
+
+# Git history not needed in image
+.git
+.gitignore

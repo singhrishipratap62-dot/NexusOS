@@ -1,0 +1,26 @@
+{
+  "name": "@nexus/workers",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "prebuild": "pnpm --filter @nexus/contracts build && pnpm --filter @nexus/shared build",
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/index.js",
+    "lint": "echo 'No lint configured for workers'",
+    "test": "vitest run --passWithNoTests"
+  },
+  "dependencies": {
+    "@nexus/shared": "workspace:*",
+    "@prisma/client": "^6.3.1",
+    "bullmq": "^5.41.0",
+    "ioredis": "^5.4.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "prisma": "^6.3.1",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  }
+}

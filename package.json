@@ -1,0 +1,18 @@
+{
+  "name": "nexusos-day1-mvp",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "pnpm@10.17.1",
+  "scripts": {
+    "build": "pnpm -r build",
+    "lint": "pnpm -r lint",
+    "test": "pnpm -r test",
+    "test:smoke": "pnpm --filter @nexus/api test:smoke",
+    "dev:api": "pnpm --filter @nexus/contracts build && pnpm --filter @nexus/shared build && pnpm --filter @nexus/api dev",
+    "dev:web": "pnpm --filter @nexus/contracts build && pnpm --filter @nexus/web dev",
+    "dev:workers": "pnpm --filter @nexus/contracts build && pnpm --filter @nexus/shared build && pnpm --filter @nexus/workers dev",
+    "prisma:generate": "pnpm --filter @nexus/api prisma:generate",
+    "prisma:migrate": "pnpm --filter @nexus/api prisma:migrate",
+    "seed": "pnpm --filter @nexus/api seed"
+  }
+}
