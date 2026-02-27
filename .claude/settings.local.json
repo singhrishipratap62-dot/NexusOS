@@ -33,7 +33,19 @@
       "Bash(pnpm --filter @nexus/shared build:*)",
       "Bash(pnpm --filter @nexus/api build:*)",
       "Bash(pnpm --filter @nexus/workers build:*)",
-      "Bash(pnpm --filter @nexus/web build:*)"
+      "Bash(pnpm --filter @nexus/web build:*)",
+      "Bash(grep:*)",
+      "Bash(head:*)",
+      "Bash(ls:*)",
+      "Bash(pnpm --filter @nexus/api exec tsc --noEmit)",
+      "Bash(pnpm --filter @nexus/web exec tsc:*)",
+      "Bash(pnpm --filter @nexus/shared tsc --noEmit)",
+      "Bash(pnpm --filter @nexus/contracts tsc --noEmit)",
+      "Bash(npx tsc --noEmit)",
+      "Bash(pnpm prisma validate)",
+      "Bash(DATABASE_URL=\"postgresql://fake:fake@localhost:5432/nexusos\" pnpm --filter @nexus/api prisma validate)",
+      "Bash(npx tsc --noEmit -p apps/api/tsconfig.json)",
+      "Bash(npx -p typescript tsc --noEmit)"
     ]
   }
 }

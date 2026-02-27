@@ -98,6 +98,8 @@ export interface WarRoomOpportunity {
     paybackMonths: number | null;
     roiScore: number;
     workflowConfidence: number;
+    monthlyRuns: number;
+    avgMinutesPerRun: number;
     recommendationStatus: RecommendationStatus;
     reviewStatus: ReviewStatus;
 }

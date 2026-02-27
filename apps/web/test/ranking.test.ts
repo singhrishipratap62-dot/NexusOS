@@ -12,6 +12,8 @@ const sampleOpportunities = [
     paybackMonths: 4,
     roiScore: 0.9,
     workflowConfidence: 0.61,
+    monthlyRuns: 50,
+    avgMinutesPerRun: 15,
     recommendationStatus: 'NEEDS_REVIEW' as const,
     reviewStatus: 'PENDING_REVIEW' as const
   },
@@ -25,6 +27,8 @@ const sampleOpportunities = [
     paybackMonths: 5,
     roiScore: 0.8,
     workflowConfidence: 0.88,
+    monthlyRuns: 30,
+    avgMinutesPerRun: 10,
     recommendationStatus: 'RECOMMENDED' as const,
     reviewStatus: 'AUTO_APPROVED' as const
   },
@@ -38,6 +42,8 @@ const sampleOpportunities = [
     paybackMonths: null,
     roiScore: 0.1,
     workflowConfidence: 0.9,
+    monthlyRuns: 10,
+    avgMinutesPerRun: 60,
     recommendationStatus: 'NOT_RECOMMENDED' as const,
     reviewStatus: 'REJECTED' as const
   }

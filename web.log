@@ -1,0 +1,90 @@
+
+> nexusos-day1-mvp@0.1.0 dev:web /Users/rishi/Documents/NexusOS
+> pnpm --filter @nexus/contracts build && pnpm --filter @nexus/web dev
+
+
+> @nexus/contracts@0.1.0 build /Users/rishi/Documents/NexusOS/packages/contracts
+> tsc -p tsconfig.json
+
+
+> @nexus/web@0.1.0 dev /Users/rishi/Documents/NexusOS/apps/web
+> next dev -p ${WEB_PORT:-3001}
+
+  ▲ Next.js 14.2.35
+  - Local:        http://localhost:3001
+
+ ✓ Starting...
+ ✓ Ready in 2.4s
+ ✓ Compiled /middleware in 282ms (72 modules)
+ ○ Compiling /api/auth/[action] ...
+ ✓ Compiled /api/auth/[action] in 533ms (56 modules)
+ POST /api/auth/login 200 in 6261ms
+ ○ Compiling /war-room ...
+ ✓ Compiled /war-room in 4.2s (637 modules)
+ ✓ Compiled /api/proxy in 280ms (333 modules)
+ GET /api/proxy?path=%2Fwar-room%2Fopportunities%3FincludeNeedsReview%3Dtrue%26sortBy%3Dpriority%26sortDir%3Ddesc%26limit%3D50 200 in 1149ms
+ GET /api/proxy?path=%2Fwar-room%2Fbleed-map 200 in 3187ms
+ GET /api/proxy?path=%2Fwar-room%2Fai-vs-human 200 in 3288ms
+ GET /api/proxy?path=%2Fwar-room%2Fopportunities%3FincludeNeedsReview%3Dtrue%26sortBy%3Dpriority%26sortDir%3Ddesc%26limit%3D50 200 in 2517ms
+ GET /api/proxy?path=%2Fwar-room%2Fbleed-map 200 in 547ms
+ GET /api/proxy?path=%2Fwar-room%2Fai-vs-human 200 in 544ms
+ GET /api/proxy?path=%2Fwar-room%2Fexecutive-summary 200 in 4940ms
+ GET /api/proxy?path=%2Fwar-room%2Fexecutive-summary 200 in 1167ms
+ ○ Compiling /connectors ...
+ ✓ Compiled /connectors in 834ms (672 modules)
+ GET /api/proxy?path=%2Fwar-room%2Fevents 200 in 9665ms
+ GET /api/proxy?path=%2Fconnectors 200 in 1151ms
+ GET /api/proxy?path=%2Fconnectors%2Fsync-jobs 200 in 1162ms
+ GET /api/proxy?path=%2Fconnectors 200 in 1173ms
+ GET /api/proxy?path=%2Fconnectors%2Fsync-jobs 200 in 1180ms
+ GET /api/proxy?path=%2Fconnectors 200 in 1122ms
+ GET /api/proxy?path=%2Fconnectors%2Fsync-jobs 200 in 3355ms
+ GET /api/proxy?path=%2Fconnectors 200 in 565ms
+ GET /api/proxy?path=%2Fconnectors%2Fsync-jobs 200 in 4443ms
+ GET /api/proxy?path=%2Fconnectors 200 in 4463ms
+ GET /api/proxy?path=%2Fconnectors%2Fsync-jobs 200 in 1106ms
+ ○ Compiling /agents ...
+ ✓ Compiled /agents in 891ms (663 modules)
+ GET /api/proxy?path=%2Fagents 200 in 710ms
+ GET /api/proxy?path=%2Fagents 200 in 743ms
+ GET /api/proxy?path=%2Fagents 200 in 739ms
+ ○ Compiling /runs ...
+ ✓ Compiled /runs in 1048ms (686 modules)
+ GET /api/proxy?path=%2Fagents 200 in 340ms
+ GET /api/proxy?path=%2Fagents 200 in 344ms
+ GET /api/proxy?path=%2Fai%2Foutcomes 200 in 564ms
+ GET /api/proxy?path=%2Fautomation%2Fblueprints 200 in 830ms
+ GET /api/proxy?path=%2Fautomation%2Fruns 200 in 813ms
+ GET /api/proxy?path=%2Fautomation%2Fblueprints 200 in 823ms
+ GET /api/proxy?path=%2Fautomation%2Fruns 200 in 842ms
+ GET /api/proxy?path=%2Fai%2Foutcomes 200 in 280ms
+ GET /api/proxy?path=%2Fai%2Foutcomes 200 in 288ms
+ GET /api/proxy?path=%2Fautomation%2Fblueprints 200 in 562ms
+ GET /api/proxy?path=%2Fautomation%2Fruns 200 in 567ms
+ GET /api/proxy?path=%2Fai%2Foutcomes 200 in 721ms
+ GET /api/proxy?path=%2Fautomation%2Fblueprints 200 in 726ms
+ GET /api/proxy?path=%2Fautomation%2Fblueprints 200 in 727ms
+ GET /api/proxy?path=%2Fautomation%2Fruns 200 in 730ms
+ GET /api/proxy?path=%2Fautomation%2Fruns 200 in 731ms
+ GET /api/proxy?path=%2Fai%2Foutcomes 200 in 564ms
+ GET /api/proxy?path=%2Fai%2Foutcomes 200 in 278ms
+ GET /api/proxy?path=%2Fautomation%2Fruns 200 in 541ms
+ GET /api/proxy?path=%2Fautomation%2Fblueprints 200 in 542ms
+ GET /api/proxy?path=%2Fagents 200 in 551ms
+ GET /api/proxy?path=%2Fagents 200 in 554ms
+ GET /api/proxy?path=%2Fagents 200 in 542ms
+ GET /api/proxy?path=%2Fagents 200 in 547ms
+ GET /api/proxy?path=%2Fagents 200 in 275ms
+ ○ Compiling /chains ...
+ ✓ Compiled /chains in 1217ms (752 modules)
+ GET /api/proxy?path=%2Fchains 200 in 1126ms
+ GET /api/proxy?path=%2Fchains 200 in 1117ms
+ ○ Compiling /chains/builder ...
+ ✓ Compiled /chains/builder in 605ms (770 modules)
+ GET /api/proxy?path=%2Fagents 200 in 317ms
+ GET /api/proxy?path=%2Fagents 200 in 292ms
+ POST /api/proxy?path=%2Fai%2Fchat 200 in 83103ms
+/Users/rishi/Documents/NexusOS/apps/web:
+ ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL  @nexus/web@0.1.0 dev: `next dev -p ${WEB_PORT:-3001}`
+Command failed with signal "SIGHUP"
+ ELIFECYCLE  Command failed.

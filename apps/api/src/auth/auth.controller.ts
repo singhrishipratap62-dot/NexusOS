@@ -1,36 +1,56 @@
 import {
   Body,
   Controller,
+  Get,
   HttpCode,
   HttpStatus,
-  Post
+  Post,
+  Req
 } from '@nestjs/common';
+import { IsEmail, IsOptional, IsString, MinLength } from 'class-validator';
 import { AuthService } from './auth.service';
 import { Public } from './public.decorator';
+import { requireTenantContext, TenantRequest } from '../common/tenant-request';
 
 class RegisterDto {
+  @IsEmail()
   email!: string;
+
+  @IsString()
+  @MinLength(8)
   password!: string;
+
+  @IsString()
+  @IsOptional()
   name?: string;
 }
 
 class LoginDto {
+  @IsEmail()
   email!: string;
+
+  @IsString()
   password!: string;
+
+  @IsString()
+  @IsOptional()
   tenantId?: string;
 }
 
 class RefreshDto {
+  @IsString()
   refreshToken!: string;
 }
 
 class LogoutDto {
+  @IsString()
   refreshToken!: string;
 }
 
+
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(private readonly authService: AuthService) { }
 
   @Public()
   @Post('register')
@@ -56,5 +76,11 @@ export class AuthController {
   @HttpCode(HttpStatus.NO_CONTENT)
   async logout(@Body() body: LogoutDto) {
     await this.authService.logout(body.refreshToken);
+  }
+
+  @Get('me')
+  async me(@Req() request: TenantRequest) {
+    const ctx = requireTenantContext(request);
+    return this.authService.getProfile(ctx.actorId, ctx.tenantId);
   }
 }

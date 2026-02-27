@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { ConnectorsService } from '../src/connectors/connectors.service';
+import { decryptToken } from '@nexus/shared';
 
 function createJsonResponse(body: unknown, init?: { status?: number }) {
   return new Response(JSON.stringify(body), {
@@ -105,16 +106,12 @@ describe('ConnectorsService', () => {
     expect(requestBody).toContain('grant_type=authorization_code');
     expect(requestBody).toContain('code=gmail-auth-code');
 
-    expect(connectorUpdate).toHaveBeenCalledWith({
-      where: {
-        id: 'connector-gmail-1'
-      },
-      data: {
-        accessToken: 'gmail-access-token',
-        refreshToken: 'gmail-refresh-token',
-        checkpoint: {}
-      }
-    });
+    // Tokens are stored encrypted — verify they decrypt to the original values
+    const updateCall = connectorUpdate.mock.calls[0]?.[0];
+    expect(updateCall.where).toEqual({ id: 'connector-gmail-1' });
+    expect(updateCall.data.checkpoint).toEqual({});
+    expect(decryptToken(updateCall.data.accessToken)).toBe('gmail-access-token');
+    expect(decryptToken(updateCall.data.refreshToken)).toBe('gmail-refresh-token');
 
     vi.unstubAllGlobals();
   });

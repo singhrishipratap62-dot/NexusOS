@@ -28,9 +28,27 @@ import { WarRoomService } from './war-room/war-room.service';
 import { BootstrapService } from './bootstrap.service';
 import { AutomationController } from './automation/automation.controller';
 import { AutomationService } from './automation/automation.service';
+import { StepExecutorService } from './automation/step-executor.service';
+import { AgentReasoningService } from './automation/agent-reasoning.service';
+import { TriggerEvaluatorService } from './automation/trigger-evaluator.service';
+import { AgentMemoryService } from './automation/agent-memory.service';
+import { AgentsController } from './automation/agents.controller';
+import { ChainController } from './automation/chain.controller';
+import { ChainOrchestratorService } from './automation/chain-orchestrator.service';
+import { AiAnalysisController } from './ai/ai-analysis.controller';
+import { AiController } from './ai/ai.controller';
+import { BlueprintGeneratorService } from './ai/blueprint-generator.service';
+import { OutcomeTrackerService } from './ai/outcome-tracker.service';
+import { LlmService } from './ai/llm.service';
+import { RateLimitMiddleware } from './common/rate-limit.middleware';
+import { RequestLoggerMiddleware } from './common/request-logger.middleware';
+import { SanitizeInterceptor } from './common/sanitize.interceptor';
+import { AiModule } from './ai/ai.module';
+import { DemoController } from './demo/demo.controller';
+import { DemoService } from './demo/demo.service';
 
 @Module({
-  imports: [],
+  imports: [AiModule],
   controllers: [
     HealthController,
     AuthController,
@@ -39,7 +57,12 @@ import { AutomationService } from './automation/automation.service';
     TenantsController,
     WarRoomController,
     ReviewController,
-    AutomationController
+    AutomationController,
+    AgentsController,
+    AiAnalysisController,
+    AiController,
+    ChainController,
+    DemoController
   ],
   providers: [
     // Explicit useFactory on every provider so NestJS DI resolves correctly
@@ -74,9 +97,9 @@ import { AutomationService } from './automation/automation.service';
     },
     {
       provide: PipelineService,
-      useFactory: (prisma: PrismaService, feasibility: FeasibilityService) =>
-        new PipelineService(prisma, feasibility),
-      inject: [PrismaService, FeasibilityService]
+      useFactory: (prisma: PrismaService, feasibility: FeasibilityService, triggerEvaluator: TriggerEvaluatorService) =>
+        new PipelineService(prisma, feasibility, triggerEvaluator),
+      inject: [PrismaService, FeasibilityService, TriggerEvaluatorService]
     },
     {
       provide: ConnectorsService,
@@ -104,10 +127,44 @@ import { AutomationService } from './automation/automation.service';
       useFactory: (pipeline: PipelineService) => new BootstrapService(pipeline),
       inject: [PipelineService]
     },
+    StepExecutorService,
+    {
+      provide: AgentMemoryService,
+      useFactory: (prisma: PrismaService, llm: LlmService) => new AgentMemoryService(prisma, llm),
+      inject: [PrismaService, LlmService]
+    },
+    {
+      provide: AgentReasoningService,
+      useFactory: (llm: LlmService, agentMemory: AgentMemoryService) => new AgentReasoningService(llm, agentMemory),
+      inject: [LlmService, AgentMemoryService]
+    },
+    {
+      provide: TriggerEvaluatorService,
+      useFactory: (prisma: PrismaService) => new TriggerEvaluatorService(prisma),
+      inject: [PrismaService]
+    },
+    {
+      provide: OutcomeTrackerService,
+      useFactory: (prisma: PrismaService) => new OutcomeTrackerService(prisma),
+      inject: [PrismaService]
+    },
+    {
+      provide: BlueprintGeneratorService,
+      useFactory: (prisma: PrismaService, llm: LlmService) =>
+        new BlueprintGeneratorService(prisma, llm),
+      inject: [PrismaService, LlmService]
+    },
     {
       provide: AutomationService,
-      useFactory: (prisma: PrismaService) => new AutomationService(prisma),
-      inject: [PrismaService]
+      useFactory: (prisma: PrismaService, stepExecutor: StepExecutorService, outcomeTracker: OutcomeTrackerService, agentReasoning: AgentReasoningService, agentMemory: AgentMemoryService) =>
+        new AutomationService(prisma, stepExecutor, outcomeTracker, agentReasoning, agentMemory),
+      inject: [PrismaService, StepExecutorService, OutcomeTrackerService, AgentReasoningService, AgentMemoryService]
+    },
+    {
+      provide: ChainOrchestratorService,
+      useFactory: (prisma: PrismaService, automationService: AutomationService) =>
+        new ChainOrchestratorService(prisma, automationService),
+      inject: [PrismaService, AutomationService]
     },
     // Global JWT guard — all routes require auth unless decorated @Public()
     {
@@ -126,12 +183,23 @@ import { AutomationService } from './automation/automation.service';
       provide: APP_INTERCEPTOR,
       useFactory: (auditService: AuditService) => new AuditInterceptor(auditService),
       inject: [AuditService]
+    },
+    {
+      provide: DemoService,
+      useFactory: (prisma: PrismaService, jwtTokenService: JwtTokenService) => new DemoService(prisma, jwtTokenService),
+      inject: [PrismaService, JwtTokenService]
+    },
+    // Global input sanitization
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: SanitizeInterceptor
     }
   ]
 })
 export class AppModule implements NestModule {
-  configure(_consumer: MiddlewareConsumer): void {
-    // Auth is now handled by JwtAuthGuard (APP_GUARD) globally.
-    // Tenant context is extracted from JWT claims in the guard.
+  configure(consumer: MiddlewareConsumer): void {
+    consumer
+      .apply(RequestLoggerMiddleware, RateLimitMiddleware)
+      .forRoutes('*');
   }
 }

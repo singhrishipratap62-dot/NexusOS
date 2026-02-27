@@ -14,5 +14,8 @@
     "prisma:generate": "pnpm --filter @nexus/api prisma:generate",
     "prisma:migrate": "pnpm --filter @nexus/api prisma:migrate",
     "seed": "pnpm --filter @nexus/api seed"
+  },
+  "dependencies": {
+    "dotenv": "^17.3.1"
   }
 }

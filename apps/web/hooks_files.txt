@@ -1,0 +1,52 @@
+./app/settings/page.tsx:28:  const [activeTab, setActiveTab] = useState('team');
+./app/settings/page.tsx:29:  const [saving, setSaving] = useState(false);
+./app/settings/page.tsx:30:  const [orgName, setOrgName] = useState('My Organization');
+./app/settings/page.tsx:35:  const [notifications, setNotifications] = useState({
+./app/agents/[id]/page.tsx:86:    const [loading, setLoading] = useState(true);
+./app/agents/[id]/page.tsx:89:    const [personaEditing, setPersonaEditing] = useState(false);
+./app/agents/[id]/page.tsx:90:    const [personaValue, setPersonaValue] = useState('');
+./app/agents/[id]/page.tsx:93:    const fetchAgentAndMemories = useCallback(async () => {
+./app/agents/[id]/page.tsx:116:    useEffect(() => { fetchAgentAndMemories(); }, [fetchAgentAndMemories]);
+./app/war-room/war-room-client.tsx:541:    const [confirming, setConfirming] = useState(false);
+./app/war-room/war-room-client.tsx:542:    const [loading, setLoading] = useState(true);
+./app/war-room/war-room-client.tsx:544:    const fetchAll = useCallback(async () => {
+./app/war-room/war-room-client.tsx:560:    useEffect(() => { fetchAll(); }, [fetchAll]);
+./app/war-room/war-room-client.tsx:563:    useEffect(() => {
+./app/(auth)/register/page.tsx:12:    const [name, setName] = useState('');
+./app/(auth)/register/page.tsx:13:    const [email, setEmail] = useState('');
+./app/(auth)/register/page.tsx:14:    const [password, setPassword] = useState('');
+./app/(auth)/register/page.tsx:15:    const [error, setError] = useState('');
+./app/(auth)/register/page.tsx:16:    const [loading, setLoading] = useState(false);
+./app/(auth)/login/page.tsx:14:    const [email, setEmail] = useState('');
+./app/(auth)/login/page.tsx:15:    const [password, setPassword] = useState('');
+./app/(auth)/login/page.tsx:16:    const [error, setError] = useState('');
+./app/(auth)/login/page.tsx:17:    const [loading, setLoading] = useState(false);
+./app/chains/chains-client.tsx:10:    const [loading, setLoading] = useState(true);
+./app/chains/chains-client.tsx:12:    useEffect(() => {
+./app/chains/[id]/chain-detail-client.tsx:11:    const [loading, setLoading] = useState(true);
+./app/chains/[id]/chain-detail-client.tsx:12:    const [running, setRunning] = useState(false);
+./app/chains/[id]/chain-detail-client.tsx:16:    const fetchDetail = useCallback(async () => {
+./app/chains/[id]/chain-detail-client.tsx:28:    useEffect(() => { fetchDetail(); }, [fetchDetail]);
+./app/chains/builder/chain-builder-client.tsx:10:    const [name, setName] = useState('');
+./app/chains/builder/chain-builder-client.tsx:11:    const [description, setDescription] = useState('');
+./app/chains/builder/chain-builder-client.tsx:15:    const [loading, setLoading] = useState(true);
+./app/chains/builder/chain-builder-client.tsx:16:    const [saving, setSaving] = useState(false);
+./app/chains/builder/chain-builder-client.tsx:18:    useEffect(() => {
+./app/landing-client.tsx:12:    const [isGeneratingDemo, setIsGeneratingDemo] = useState(false);
+./app/runs/runs-client.tsx:95:    const [expanded, setExpanded] = useState(false);
+./app/onboarding/page.tsx:35:    const [currentStep, setCurrentStep] = useState(0);
+./app/onboarding/page.tsx:36:    const [isSyncing, setIsSyncing] = useState(false);
+./app/onboarding/page.tsx:37:    const [hasConnected, setHasConnected] = useState(false);
+./app/onboarding/page.tsx:38:    const [hasAudited, setHasAudited] = useState(false);
+./app/onboarding/page.tsx:39:    const [hasDeployed, setHasDeployed] = useState(false);
+./app/onboarding/page.tsx:40:    const [isDeploying, setIsDeploying] = useState(false);
+./app/onboarding/page.tsx:48:    useEffect(() => {
+./components/war-room-table.tsx:48:  const ranked = useMemo(() => {
+./components/war-room-table.tsx:57:  const handleAnalyze = useCallback(async (workflowId: string) => {
+./components/war-room-table.tsx:76:  const handleGenerateBlueprint = useCallback(async (workflowId: string) => {
+./components/chat-panel.tsx:21:    const [isOpen, setIsOpen] = useState(false);
+./components/chat-panel.tsx:25:    const [input, setInput] = useState('');
+./components/chat-panel.tsx:26:    const [isLoading, setIsLoading] = useState(false);
+./components/chat-panel.tsx:30:    useEffect(() => {
+./components/chat-panel.tsx:34:    const sendMessage = useCallback(async (text: string) => {
+./components/review-queue-table.tsx:62:  const [reason, setReason] = useState('');

@@ -1,5 +1,6 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
 import { Bell, LogOut, User } from 'lucide-react';
 
 interface TopBarProps {
@@ -8,6 +9,18 @@ interface TopBarProps {
 }
 
 export function TopBar({ title, subtitle }: TopBarProps) {
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' });
+    } catch {
+      // Ignore
+    }
+    router.push('/login');
+    router.refresh();
+  };
+
   return (
     <header className="top-bar">
       <div>
@@ -21,7 +34,12 @@ export function TopBar({ title, subtitle }: TopBarProps) {
         <button type="button" className="btn-ghost p-2 rounded-full" aria-label="Profile">
           <User className="w-5 h-5 text-muted-foreground" />
         </button>
-        <button type="button" className="btn-ghost p-2 rounded-full" aria-label="Logout">
+        <button
+          type="button"
+          className="btn-ghost p-2 rounded-full"
+          aria-label="Sign out"
+          onClick={handleLogout}
+        >
           <LogOut className="w-5 h-5 text-muted-foreground" />
         </button>
       </div>

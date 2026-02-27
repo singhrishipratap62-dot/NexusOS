@@ -52,7 +52,7 @@ interface GmailApiErrorEnvelope {
   error?: GmailApiError;
 }
 
-class NonRetriableRequestError extends Error {}
+class NonRetriableRequestError extends Error { }
 
 function parseInternalDateMs(value: string | number | undefined): number {
   if (value === undefined) {
@@ -116,20 +116,34 @@ export class GmailReadOnlyConnector {
   private readonly fetchImpl: typeof fetch;
   private readonly maxRetries: number;
   private readonly initialBackoffMs: number;
+  private accessToken: string;
+  private readonly refreshToken?: string;
+  private readonly clientId?: string;
+  private readonly clientSecret?: string;
+  private readonly onTokenRefresh?: (newToken: string) => Promise<void>;
 
   constructor(
-    private readonly accessToken: string,
+    accessToken: string,
     options?: {
       baseUrl?: string;
       fetchImpl?: typeof fetch;
       maxRetries?: number;
       initialBackoffMs?: number;
+      refreshToken?: string;
+      clientId?: string;
+      clientSecret?: string;
+      onTokenRefresh?: (newToken: string) => Promise<void>;
     }
   ) {
+    this.accessToken = accessToken;
     this.baseUrl = options?.baseUrl ?? 'https://gmail.googleapis.com/gmail/v1/users/me';
     this.fetchImpl = options?.fetchImpl ?? fetch;
     this.maxRetries = options?.maxRetries ?? 4;
     this.initialBackoffMs = options?.initialBackoffMs ?? 350;
+    this.refreshToken = options?.refreshToken;
+    this.clientId = options?.clientId;
+    this.clientSecret = options?.clientSecret;
+    this.onTokenRefresh = options?.onTokenRefresh;
   }
 
   private async wait(ms: number): Promise<void> {
@@ -138,6 +152,37 @@ export class GmailReadOnlyConnector {
 
   private backoffMs(attempt: number): number {
     return this.initialBackoffMs * 2 ** attempt;
+  }
+
+  private async performTokenRefresh(): Promise<void> {
+    if (!this.refreshToken || !this.clientId || !this.clientSecret) {
+      throw new Error('Cannot refresh token: missing refreshToken, clientId, or clientSecret');
+    }
+
+    const response = await this.fetchImpl('https://oauth2.googleapis.com/token', {
+      method: 'POST',
+      headers: { 'content-type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        client_id: this.clientId,
+        client_secret: this.clientSecret,
+        refresh_token: this.refreshToken,
+        grant_type: 'refresh_token'
+      })
+    });
+
+    if (!response.ok) {
+      throw new NonRetriableRequestError(`Failed to refresh access token: HTTP ${response.status}`);
+    }
+
+    const payload = await response.json() as { access_token?: string };
+    if (!payload.access_token) {
+      throw new NonRetriableRequestError('Failed to refresh access token: no access_token in response');
+    }
+
+    this.accessToken = payload.access_token;
+    if (this.onTokenRefresh) {
+      await this.onTokenRefresh(this.accessToken);
+    }
   }
 
   private parseRetryAfterMs(headers: Headers): number | null {
@@ -176,6 +221,15 @@ export class GmailReadOnlyConnector {
             Authorization: `Bearer ${this.accessToken}`
           }
         });
+
+        if (response.status === 401 && this.refreshToken && attempt < this.maxRetries) {
+          try {
+            await this.performTokenRefresh();
+            continue; // Retry the request with the newly refreshed access token
+          } catch (refreshErr) {
+            throw new NonRetriableRequestError(`Token refresh failed: ${(refreshErr as Error).message}`);
+          }
+        }
 
         const retriableStatus = response.status === 429 || response.status >= 500;
         const body = (await response.json()) as T & GmailApiErrorEnvelope;

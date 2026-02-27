@@ -7,6 +7,439 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model User {
+  id            String         @id @default(cuid())
+  email         String         @unique
+  passwordHash  String
+  name          String?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  refreshTokens RefreshToken[]
+  memberships   TenantMember[]
+
+  @@map("users")
+}
+
+model RefreshToken {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("refresh_tokens")
+}
+
+model TenantMember {
+  id       String   @id @default(cuid())
+  tenantId String
+  userId   String
+  role     UserRole @default(VIEWER)
+  joinedAt DateTime @default(now())
+  tenant   Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, userId])
+  @@index([tenantId, role])
+  @@map("tenant_members")
+}
+
+model Tenant {
+  id                   String                @id @default(cuid())
+  name                 String
+  createdAt            DateTime              @default(now())
+  isDemo               Boolean               @default(false)
+  updatedAt            DateTime              @updatedAt
+  agentChainRuns       AgentChainRun[]
+  agentChains          AgentChain[]
+  agentMemories        AgentMemory[]
+  auditEvents          AuditEvent[]
+  automationBlueprints AutomationBlueprint[]
+  automationRuns       AutomationRun[]
+  chatMessages         ChatMessage[]
+  connectors           Connector[]
+  feasibility          FeasibilityScore[]
+  hlcEstimates         HlcEstimate[]
+  normalized           NormalizedEvent[]
+  outcomeMetrics       OutcomeMetric[]
+  rawEvents            RawEvent[]
+  reviewQueue          ReviewQueue[]
+  roiSimulations       RoiSimulation[]
+  syncJobs             SyncJob[]
+  members              TenantMember[]
+  workflows            Workflow[]
+
+  @@map("tenants")
+}
+
+model Connector {
+  id           String        @id @default(cuid())
+  tenantId     String
+  provider     Provider
+  mode         ConnectorMode @default(READ_ONLY)
+  accessToken  String?
+  refreshToken String?
+  checkpoint   Json?
+  lastSyncedAt DateTime?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  tenant       Tenant        @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  rawEvents    RawEvent[]
+  syncJobs     SyncJob[]
+
+  @@unique([tenantId, provider])
+  @@index([tenantId, provider])
+  @@map("connectors")
+}
+
+model SyncJob {
+  id          String        @id @default(cuid())
+  tenantId    String
+  connectorId String
+  status      SyncJobStatus @default(QUEUED)
+  startedAt   DateTime?
+  finishedAt  DateTime?
+  error       String?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  connector   Connector     @relation(fields: [connectorId], references: [id], onDelete: Cascade)
+  tenant      Tenant        @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, status, createdAt])
+  @@map("sync_jobs")
+}
+
+model RawEvent {
+  id            String           @id @default(cuid())
+  tenantId      String
+  connectorId   String
+  provider      Provider
+  externalId    String
+  eventHash     String
+  payload       Json
+  occurredAt    DateTime
+  ingestedAt    DateTime         @default(now())
+  failureReason String?
+  normalized    NormalizedEvent?
+  connector     Connector        @relation(fields: [connectorId], references: [id], onDelete: Cascade)
+  tenant        Tenant           @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, provider, eventHash])
+  @@index([tenantId, occurredAt])
+  @@index([tenantId, provider, externalId])
+  @@map("raw_events")
+}
+
+model NormalizedEvent {
+  id            String    @id @default(cuid())
+  tenantId      String
+  rawEventId    String?   @unique
+  provider      Provider
+  externalId    String
+  actor         String
+  tool          String
+  action        String
+  channel       String?
+  occurredAt    DateTime
+  payload       Json
+  malformed     Boolean   @default(false)
+  failureReason String?
+  createdAt     DateTime  @default(now())
+  rawEvent      RawEvent? @relation(fields: [rawEventId], references: [id])
+  tenant        Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, provider, externalId])
+  @@index([tenantId, occurredAt])
+  @@index([tenantId, tool, action])
+  @@map("normalized_events")
+}
+
+model Workflow {
+  id               String            @id @default(cuid())
+  tenantId         String
+  workflowKey      String
+  name             String
+  confidence       Float
+  avgMinutesPerRun Float
+  monthlyRuns      Int
+  eventCount30d    Int
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  aiAnalysis       Json?
+  aiAnalyzedAt     DateTime?
+  edges            WorkflowEdge[]
+  feasibility      FeasibilityScore?
+  hlcEstimate      HlcEstimate?
+  nodes            WorkflowNode[]
+  reviewItem       ReviewQueue?
+  roiSimulation    RoiSimulation?
+  tenant           Tenant            @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, workflowKey])
+  @@index([tenantId, confidence])
+  @@index([tenantId, monthlyRuns])
+  @@map("workflows")
+}
+
+model WorkflowNode {
+  id         String   @id @default(cuid())
+  tenantId   String
+  workflowId String
+  actor      String
+  tool       String
+  action     String
+  sequence   Int
+  confidence Float
+  createdAt  DateTime @default(now())
+  workflow   Workflow @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, workflowId, sequence])
+  @@map("nodes")
+}
+
+model WorkflowEdge {
+  id         String   @id @default(cuid())
+  tenantId   String
+  workflowId String
+  fromNodeId String
+  toNodeId   String
+  confidence Float
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  workflow   Workflow @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, workflowId])
+  @@map("edges")
+}
+
+model HlcEstimate {
+  id              String   @id @default(cuid())
+  tenantId        String
+  workflowId      String   @unique
+  annualLaborCost Float
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  tenant          Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  workflow        Workflow @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, annualLaborCost])
+  @@map("hlc_estimates")
+}
+
+model FeasibilityScore {
+  id               String   @id @default(cuid())
+  tenantId         String
+  workflowId       String   @unique
+  feasibilityScore Float
+  confidence       Float
+  breakdown        Json
+  rationale        Json?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  tenant           Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  workflow         Workflow @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, feasibilityScore, confidence])
+  @@map("feasibility_scores")
+}
+
+model RoiSimulation {
+  id                 String   @id @default(cuid())
+  tenantId           String
+  workflowId         String   @unique
+  annualLaborCost    Float
+  annualNetSavings   Float
+  paybackMonths      Float?
+  automationCoverage Float
+  roiScore           Float
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+  tenant             Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  workflow           Workflow @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, roiScore, annualNetSavings])
+  @@map("roi_simulations")
+}
+
+model ReviewQueue {
+  id                   String               @id @default(cuid())
+  tenantId             String
+  workflowId           String               @unique
+  recommendationStatus RecommendationStatus
+  reviewStatus         ReviewStatus         @default(PENDING_REVIEW)
+  reason               String?
+  reviewerId           String?
+  reviewedAt           DateTime?
+  createdAt            DateTime             @default(now())
+  updatedAt            DateTime             @updatedAt
+  tenant               Tenant               @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  workflow             Workflow             @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, recommendationStatus, reviewStatus])
+  @@map("review_queue")
+}
+
+model AuditEvent {
+  id        String   @id @default(cuid())
+  tenantId  String
+  actorId   String
+  path      String
+  method    String
+  action    String
+  metadata  Json?
+  createdAt DateTime @default(now())
+  tenant    Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, createdAt])
+  @@index([tenantId, action])
+  @@map("audit_events")
+}
+
+model AutomationBlueprint {
+  id                  String          @id @default(cuid())
+  tenantId            String
+  name                String
+  description         String?
+  workflowId          String?
+  status              BlueprintStatus @default(DRAFT)
+  triggerType         TriggerType     @default(MANUAL)
+  triggerConfig       Json?
+  steps               Json
+  dryRun              Boolean         @default(true)
+  createdById         String
+  createdAt           DateTime        @default(now())
+  updatedAt           DateTime        @updatedAt
+  aiGenerated         Boolean         @default(false)
+  aiReasoning         String?
+  autoExecute         Boolean         @default(false)
+  confidenceThreshold Float           @default(0.85)
+  avatarUrl           String?
+  department          String?
+  jobTitle            String?
+  manager             String?
+  persona             String?
+  memories            AgentMemory[]
+  tenant              Tenant          @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  runs                AutomationRun[]
+  outcomeMetrics      OutcomeMetric[]
+
+  @@index([tenantId, status])
+  @@map("automation_blueprints")
+}
+
+model AutomationRun {
+  id          String              @id @default(cuid())
+  tenantId    String
+  blueprintId String
+  status      RunStatus           @default(QUEUED)
+  triggeredBy String
+  dryRun      Boolean             @default(true)
+  stepResults Json?
+  logs        Json?
+  startedAt   DateTime?
+  finishedAt  DateTime?
+  error       String?
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+  blueprint   AutomationBlueprint @relation(fields: [blueprintId], references: [id], onDelete: Cascade)
+  tenant      Tenant              @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, status, createdAt])
+  @@index([tenantId, blueprintId])
+  @@map("automation_runs")
+}
+
+model OutcomeMetric {
+  id            String              @id @default(cuid())
+  tenantId      String
+  runId         String
+  blueprintId   String
+  metricType    String
+  baselineValue Float
+  currentValue  Float
+  measuredAt    DateTime            @default(now())
+  updatedAt     DateTime            @updatedAt
+  blueprint     AutomationBlueprint @relation(fields: [blueprintId], references: [id], onDelete: Cascade)
+  tenant        Tenant              @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, blueprintId])
+  @@index([tenantId, runId])
+  @@map("outcome_metrics")
+}
+
+model ChatMessage {
+  id             String   @id @default(cuid())
+  tenantId       String
+  conversationId String
+  role           String
+  content        String
+  metadata       Json?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  tenant         Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, conversationId, createdAt])
+  @@map("chat_messages")
+}
+
+model AgentMemory {
+  id          String              @id @default(cuid())
+  tenantId    String
+  blueprintId String
+  type        MemoryType
+  content     String
+  context     Json?
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+  blueprint   AutomationBlueprint @relation(fields: [blueprintId], references: [id], onDelete: Cascade)
+  tenant      Tenant              @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, blueprintId, type])
+  @@map("agent_memories")
+}
+
+model AgentChain {
+  id          String          @id @default(cuid())
+  tenantId    String
+  name        String
+  description String?
+  status      ChainStatus     @default(DRAFT)
+  nodes       Json
+  createdById String
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+  runs        AgentChainRun[]
+  tenant      Tenant          @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, status])
+  @@map("agent_chains")
+}
+
+model AgentChainRun {
+  id                  String         @id @default(cuid())
+  tenantId            String
+  chainId             String
+  status              ChainRunStatus @default(QUEUED)
+  nodeResults         Json?
+  inputContext        Json?
+  failedAtNode        Int?
+  retryFromNode       Int?
+  consecutiveFailures Int            @default(0)
+  startedAt           DateTime?
+  finishedAt          DateTime?
+  error               String?
+  createdAt           DateTime       @default(now())
+  updatedAt           DateTime       @updatedAt
+  chain               AgentChain     @relation(fields: [chainId], references: [id], onDelete: Cascade)
+  tenant              Tenant         @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, chainId, status])
+  @@map("agent_chain_runs")
+}
+
 enum UserRole {
   ADMIN
   ANALYST
@@ -47,297 +480,10 @@ enum RecommendationStatus {
   NOT_RECOMMENDED
 }
 
-model User {
-  id             String         @id @default(cuid())
-  email          String         @unique
-  passwordHash   String
-  name           String?
-  memberships    TenantMember[]
-  refreshTokens  RefreshToken[]
-  createdAt      DateTime       @default(now())
-  updatedAt      DateTime       @updatedAt
-
-  @@map("users")
-}
-
-model RefreshToken {
-  id        String   @id @default(cuid())
-  userId    String
-  token     String   @unique
-  expiresAt DateTime
-  createdAt DateTime @default(now())
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId])
-  @@map("refresh_tokens")
-}
-
-model TenantMember {
-  id       String   @id @default(cuid())
-  tenantId String
-  userId   String
-  role     UserRole @default(VIEWER)
-  joinedAt DateTime @default(now())
-
-  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([tenantId, userId])
-  @@index([tenantId, role])
-  @@map("tenant_members")
-}
-
-model Tenant {
-  id                  String                @id @default(cuid())
-  name                String
-  members             TenantMember[]
-  connectors          Connector[]
-  syncJobs            SyncJob[]
-  rawEvents           RawEvent[]
-  normalized          NormalizedEvent[]
-  workflows           Workflow[]
-  hlcEstimates        HlcEstimate[]
-  feasibility         FeasibilityScore[]
-  roiSimulations      RoiSimulation[]
-  reviewQueue         ReviewQueue[]
-  auditEvents         AuditEvent[]
-  automationBlueprints AutomationBlueprint[]
-  automationRuns      AutomationRun[]
-  createdAt           DateTime              @default(now())
-
-  @@map("tenants")
-}
-
-model Connector {
-  id           String        @id @default(cuid())
-  tenantId     String
-  provider     Provider
-  mode         ConnectorMode @default(READ_ONLY)
-  accessToken  String?
-  refreshToken String?
-  checkpoint   Json?
-  lastSyncedAt DateTime?
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
-
-  tenant    Tenant     @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  syncJobs  SyncJob[]
-  rawEvents RawEvent[]
-
-  @@unique([tenantId, provider])
-  @@index([tenantId, provider])
-  @@map("connectors")
-}
-
-model SyncJob {
-  id          String        @id @default(cuid())
-  tenantId    String
-  connectorId String
-  status      SyncJobStatus @default(QUEUED)
-  startedAt   DateTime?
-  finishedAt  DateTime?
-  error       String?
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
-
-  tenant    Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  connector Connector @relation(fields: [connectorId], references: [id], onDelete: Cascade)
-
-  @@index([tenantId, status, createdAt])
-  @@map("sync_jobs")
-}
-
-model RawEvent {
-  id            String   @id @default(cuid())
-  tenantId      String
-  connectorId   String
-  provider      Provider
-  externalId    String
-  eventHash     String
-  payload       Json
-  occurredAt    DateTime
-  ingestedAt    DateTime @default(now())
-  failureReason String?
-
-  tenant     Tenant           @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  connector  Connector        @relation(fields: [connectorId], references: [id], onDelete: Cascade)
-  normalized NormalizedEvent?
-
-  @@unique([tenantId, provider, eventHash])
-  @@index([tenantId, occurredAt])
-  @@index([tenantId, provider, externalId])
-  @@map("raw_events")
-}
-
-model NormalizedEvent {
-  id            String   @id @default(cuid())
-  tenantId      String
-  rawEventId    String?  @unique
-  provider      Provider
-  externalId    String
-  actor         String
-  tool          String
-  action        String
-  channel       String?
-  occurredAt    DateTime
-  payload       Json
-  malformed     Boolean  @default(false)
-  failureReason String?
-  createdAt     DateTime @default(now())
-
-  tenant   Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  rawEvent RawEvent? @relation(fields: [rawEventId], references: [id], onDelete: SetNull)
-
-  @@unique([tenantId, provider, externalId])
-  @@index([tenantId, occurredAt])
-  @@index([tenantId, tool, action])
-  @@map("normalized_events")
-}
-
-model Workflow {
-  id               String   @id @default(cuid())
-  tenantId         String
-  workflowKey      String
-  name             String
-  confidence       Float
-  avgMinutesPerRun Float
-  monthlyRuns      Int
-  eventCount30d    Int
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
-
-  tenant        Tenant            @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  nodes         WorkflowNode[]
-  edges         WorkflowEdge[]
-  hlcEstimate   HlcEstimate?
-  feasibility   FeasibilityScore?
-  roiSimulation RoiSimulation?
-  reviewItem    ReviewQueue?
-
-  @@unique([tenantId, workflowKey])
-  @@index([tenantId, confidence])
-  @@map("workflows")
-}
-
-model WorkflowNode {
-  id         String   @id @default(cuid())
-  tenantId   String
-  workflowId String
-  actor      String
-  tool       String
-  action     String
-  sequence   Int
-  confidence Float
-  createdAt  DateTime @default(now())
-
-  workflow Workflow @relation(fields: [workflowId], references: [id], onDelete: Cascade)
-
-  @@index([tenantId, workflowId, sequence])
-  @@map("nodes")
-}
-
-model WorkflowEdge {
-  id         String   @id @default(cuid())
-  tenantId   String
-  workflowId String
-  fromNodeId String
-  toNodeId   String
-  confidence Float
-  createdAt  DateTime @default(now())
-
-  workflow Workflow @relation(fields: [workflowId], references: [id], onDelete: Cascade)
-
-  @@index([tenantId, workflowId])
-  @@map("edges")
-}
-
-model HlcEstimate {
-  id              String   @id @default(cuid())
-  tenantId        String
-  workflowId      String   @unique
-  annualLaborCost Float
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-
-  tenant   Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  workflow Workflow @relation(fields: [workflowId], references: [id], onDelete: Cascade)
-
-  @@index([tenantId, annualLaborCost])
-  @@map("hlc_estimates")
-}
-
-model FeasibilityScore {
-  id               String   @id @default(cuid())
-  tenantId         String
-  workflowId       String   @unique
-  feasibilityScore Float
-  confidence       Float
-  breakdown        Json
-  rationale        Json?
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
-
-  tenant   Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  workflow Workflow @relation(fields: [workflowId], references: [id], onDelete: Cascade)
-
-  @@index([tenantId, feasibilityScore, confidence])
-  @@map("feasibility_scores")
-}
-
-model RoiSimulation {
-  id                 String   @id @default(cuid())
-  tenantId           String
-  workflowId         String   @unique
-  annualLaborCost    Float
-  annualNetSavings   Float
-  paybackMonths      Float?
-  automationCoverage Float
-  roiScore           Float
-  createdAt          DateTime @default(now())
-  updatedAt          DateTime @updatedAt
-
-  tenant   Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  workflow Workflow @relation(fields: [workflowId], references: [id], onDelete: Cascade)
-
-  @@index([tenantId, roiScore, annualNetSavings])
-  @@map("roi_simulations")
-}
-
-model ReviewQueue {
-  id                   String               @id @default(cuid())
-  tenantId             String
-  workflowId           String               @unique
-  recommendationStatus RecommendationStatus
-  reviewStatus         ReviewStatus         @default(PENDING_REVIEW)
-  reason               String?
-  reviewerId           String?
-  reviewedAt           DateTime?
-  createdAt            DateTime             @default(now())
-  updatedAt            DateTime             @updatedAt
-
-  tenant   Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  workflow Workflow @relation(fields: [workflowId], references: [id], onDelete: Cascade)
-
-  @@index([tenantId, recommendationStatus, reviewStatus])
-  @@map("review_queue")
-}
-
-model AuditEvent {
-  id        String   @id @default(cuid())
-  tenantId  String
-  actorId   String
-  path      String
-  method    String
-  action    String
-  metadata  Json?
-  createdAt DateTime @default(now())
-
-  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-
-  @@index([tenantId, createdAt])
-  @@index([tenantId, action])
-  @@map("audit_events")
+enum MemoryType {
+  EPISODIC
+  SEMANTIC
+  WORKING
 }
 
 enum BlueprintStatus {
@@ -362,50 +508,17 @@ enum RunStatus {
   WAITING_HITL
 }
 
-model AutomationBlueprint {
-  id            String          @id @default(cuid())
-  tenantId      String
-  name          String
-  description   String?
-  workflowId    String?
-  status        BlueprintStatus @default(DRAFT)
-  triggerType   TriggerType     @default(MANUAL)
-  triggerConfig Json?
-  steps         Json
-  dryRun        Boolean         @default(true)
-  createdById   String
-  createdAt     DateTime        @default(now())
-  updatedAt     DateTime        @updatedAt
-
-  tenant Tenant          @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  runs   AutomationRun[]
-
-  @@index([tenantId, status])
-  @@map("automation_blueprints")
+enum ChainStatus {
+  DRAFT
+  ACTIVE
+  PAUSED
+  ARCHIVED
 }
 
-model AutomationRun {
-  id          String    @id @default(cuid())
-  tenantId    String
-  blueprintId String
-  status      RunStatus @default(QUEUED)
-  triggeredBy String
-  dryRun      Boolean   @default(true)
-  stepResults Json?
-  logs        Json?
-  startedAt   DateTime?
-  finishedAt  DateTime?
-  error       String?
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-
-  tenant    Tenant              @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  blueprint AutomationBlueprint @relation(fields: [blueprintId], references: [id], onDelete: Cascade)
-
-  @@index([tenantId, status, createdAt])
-  @@index([tenantId, blueprintId])
-  @@map("automation_runs")
+enum ChainRunStatus {
+  QUEUED
+  RUNNING
+  SUCCEEDED
+  FAILED
+  CANCELLED
 }
-
-// Tenant back-relations for new models
-

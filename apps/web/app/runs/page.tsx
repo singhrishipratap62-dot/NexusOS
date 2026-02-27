@@ -1,32 +1,86 @@
+'use client';
+export const dynamic = 'force-dynamic';
 import { TopBar } from '../../components/ui/top-bar';
-import { Play } from 'lucide-react';
+import { clientApiFetch as apiFetch } from '../../lib/api-client';
+import { RunsPageClient } from './runs-client';
 
-export default function RunsPage(): JSX.Element {
+interface Blueprint {
+  id: string;
+  name: string;
+  description: string | null;
+  status: string;
+  triggerType: string;
+  dryRun: boolean;
+  steps: any[];
+  aiGenerated: boolean;
+  aiReasoning: string | null;
+  autoExecute: boolean;
+  confidenceThreshold: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface Run {
+  id: string;
+  blueprintId: string;
+  status: string;
+  triggeredBy: string;
+  dryRun: boolean;
+  stepResults: any[] | null;
+  logs: string[] | null;
+  startedAt: string | null;
+  finishedAt: string | null;
+  error: string | null;
+  createdAt: string;
+}
+
+interface Outcomes {
+  totalRuns: number;
+  activeBlueprints: number;
+  totalTimeSavedMinutes: number;
+  totalTimeSavedHours: number;
+  estimatedAnnualSavingsHours: number;
+}
+
+async function fetchBlueprints(): Promise<Blueprint[]> {
+  try {
+    return await apiFetch<Blueprint[]>('/automation/blueprints');
+  } catch {
+    return [];
+  }
+}
+
+async function fetchRuns(): Promise<Run[]> {
+  try {
+    return await apiFetch<Run[]>('/automation/runs');
+  } catch {
+    return [];
+  }
+}
+
+async function fetchOutcomes(): Promise<Outcomes | null> {
+  try {
+    return await apiFetch<Outcomes>('/ai/outcomes');
+  } catch {
+    return null;
+  }
+}
+
+export default async function RunsPage(): Promise<JSX.Element> {
+  const [blueprints, runs, outcomes] = await Promise.all([
+    fetchBlueprints(),
+    fetchRuns(),
+    fetchOutcomes()
+  ]);
+
   return (
     <>
       <TopBar
         title="Automation Runs"
-        subtitle="Monitor active and historical automation executions"
+        subtitle={`${blueprints.length} blueprints · ${runs.length} runs`}
       />
       <div className="page-content">
-        <div className="card p-12 text-center">
-          <div className="flex justify-center mb-4">
-            <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-              <Play className="w-6 h-6 text-primary" />
-            </div>
-          </div>
-          <h3 className="text-lg font-semibold mb-2">Agent Runtime Coming Soon</h3>
-          <p className="text-muted-foreground max-w-md mx-auto">
-            Automation execution is planned for Phase 4. Once blueprints are configured,
-            runs will appear here with real-time status and step-by-step logs.
-          </p>
-          <div className="mt-6 flex flex-wrap justify-center gap-3 text-sm text-muted-foreground">
-            <span className="badge badge-secondary">Blueprint Editor</span>
-            <span className="badge badge-secondary">Trigger System</span>
-            <span className="badge badge-secondary">Live Log Streaming</span>
-            <span className="badge badge-secondary">Human-in-the-Loop</span>
-          </div>
-        </div>
+        <RunsPageClient blueprints={blueprints} runs={runs} outcomes={outcomes} />
       </div>
     </>
   );

@@ -8,7 +8,7 @@ export interface NormalizeRawConnectorEventInput {
 
 export interface CanonicalNormalizedEvent {
   actor: string;
-  tool: 'Slack' | 'Gmail' | 'GitHub' | 'Notion' | 'Linear' | 'Jira';
+  tool: 'Slack' | 'Gmail' | 'GitHub' | 'Notion' | 'Linear' | 'Jira' | 'GCal';
   action: string;
   channel: string | null;
   payload: Record<string, unknown>;
@@ -91,30 +91,63 @@ function parseMinutesSpent(value: unknown, fallback: number): number {
   return fallback;
 }
 
+function deriveSlackWorkflowHint(channel: string | null): string {
+  if (!channel) return 'slack-general';
+  // Normalize channel ID or name into a readable workflow hint
+  const cleaned = channel.replace(/^#/, '').replace(/[^a-zA-Z0-9-_]/g, '-').toLowerCase();
+  return `slack-${cleaned || 'general'}`;
+}
+
+function deriveSlackRunKey(channel: string | null, ts: string | null): string {
+  // Group messages by channel + day for daily conversation "runs"
+  const channelPart = channel ?? 'unknown';
+  if (ts) {
+    const tsNumeric = Number(ts);
+    if (Number.isFinite(tsNumeric)) {
+      const date = new Date(Math.floor(tsNumeric * 1000));
+      const dayKey = date.toISOString().slice(0, 10); // YYYY-MM-DD
+      return `${channelPart}:${dayKey}`;
+    }
+  }
+  return `${channelPart}:${Date.now()}`;
+}
+
+function deriveSlackActor(payload: Record<string, unknown>): string {
+  return asOptionalString(payload.user) ?? asOptionalString(payload.actor) ?? 'unknown';
+}
+
 function normalizeSlack(input: {
   externalId: string;
   payload: Record<string, unknown>;
   errors: string[];
 }): CanonicalNormalizedEvent {
-  const workflowHint =
-    asOptionalString(input.payload.workflowHint) ?? 'slack-support-triage';
-  if (asOptionalString(input.payload.workflowHint) === null) {
-    input.errors.push('workflowHint missing or invalid.');
-  }
-
-  const sequence = parseSequence(input.payload.sequence) ?? 99;
-  if (parseSequence(input.payload.sequence) === null) {
-    input.errors.push('sequence missing or out of range 1-20.');
-  }
-
   const channel = asOptionalString(input.payload.channel);
-  const runKey = asOptionalString(input.payload.runKey) ?? input.externalId;
-  const minutesSpent = parseMinutesSpent(input.payload.minutesSpent, 5);
+  const ts = asOptionalString(input.payload.ts);
+  const text = asOptionalString(input.payload.text);
+  const subtype = asOptionalString(input.payload.subtype);
 
+  // Use explicit workflowHint if present (fixtures), otherwise auto-derive from channel
+  const explicitHint = asOptionalString(input.payload.workflowHint);
+  const workflowHint = explicitHint ?? deriveSlackWorkflowHint(channel);
+
+  const explicitSequence = parseSequence(input.payload.sequence);
+  // For real data: assign sequence 2 (triage) as default — most channel messages are conversation
+  const sequence = explicitSequence ?? 2;
+
+  const explicitRunKey = asOptionalString(input.payload.runKey);
+  const runKey = explicitRunKey ?? deriveSlackRunKey(channel, ts);
+
+  const minutesSpent = parseMinutesSpent(input.payload.minutesSpent, 3);
+  const actor = deriveSlackActor(input.payload);
+
+  // No errors for missing hint/sequence on real data — those are expected
   return {
-    actor: 'support-lead',
+    actor,
     tool: 'Slack',
-    action: inferAction(sequence),
+    action: subtype === 'channel_join' ? 'channel_join'
+      : subtype === 'bot_message' ? 'bot_notification'
+        : text && text.length > 200 ? 'detailed_message'
+          : 'message',
     channel,
     payload: {
       workflowHint,
@@ -124,14 +157,40 @@ function normalizeSlack(input: {
       source: {
         provider: 'SLACK',
         channel,
-        ts: asOptionalString(input.payload.ts),
-        text: asOptionalString(input.payload.text),
-        subtype: asOptionalString(input.payload.subtype)
+        ts,
+        text,
+        subtype
       }
     },
-    malformed: input.errors.length > 0,
-    failureReason: input.errors.length > 0 ? input.errors.join(' ') : null
+    malformed: false,
+    failureReason: null
   };
+}
+
+function deriveGmailWorkflowHint(subject: string | null, labelIds: string[]): string {
+  if (!subject) {
+    if (labelIds.includes('CATEGORY_PROMOTIONS')) return 'gmail-promotions';
+    if (labelIds.includes('CATEGORY_UPDATES')) return 'gmail-updates';
+    if (labelIds.includes('CATEGORY_SOCIAL')) return 'gmail-social';
+    return 'gmail-general';
+  }
+
+  // Strip Re:/Fwd: prefixes, numbers, dates, and normalize
+  let pattern = subject
+    .replace(/^(re|fwd|fw):\s*/gi, '')
+    .replace(/\d{1,4}[\/\-\.]\d{1,2}[\/\-\.]\d{1,4}/g, '') // dates
+    .replace(/\b\d{4,}\b/g, '')   // long numbers (ticket IDs, etc.)
+    .replace(/#\d+/g, '')          // issue/ticket numbers
+    .replace(/\s+/g, ' ')
+    .trim()
+    .toLowerCase();
+
+  // Truncate to first 5 meaningful words for pattern grouping
+  const words = pattern.split(/\s+/).filter(w => w.length > 1).slice(0, 5);
+  if (words.length === 0) return 'gmail-general';
+
+  const slug = words.join('-').replace(/[^a-z0-9-]/g, '').replace(/-+/g, '-').slice(0, 40);
+  return `gmail-${slug || 'general'}`;
 }
 
 function normalizeGmail(input: {
@@ -145,30 +204,27 @@ function normalizeGmail(input: {
     input.externalId.toLowerCase().includes('reply') ||
     input.externalId.toLowerCase().includes('outbound');
 
-  const workflowHint =
-    asOptionalString(input.payload.workflowHint) ?? 'customer-escalation-resolution';
-  if (asOptionalString(input.payload.workflowHint) === null) {
-    input.errors.push('workflowHint missing or invalid.');
-  }
-
-  const parsedSequence = parseSequence(input.payload.sequence);
-  const sequence = parsedSequence ?? (outbound ? 3 : 1);
-  if (parsedSequence === null) {
-    input.errors.push('sequence missing or out of range 1-20.');
-  }
-
   const threadId = asOptionalString(input.payload.threadId);
-  const historyId = asOptionalString(input.payload.historyId);
   const from = asOptionalString(input.payload.from);
   const subject = asOptionalString(input.payload.subject);
   const snippet = asOptionalString(input.payload.snippet);
-  const runKey = asOptionalString(input.payload.runKey) ?? threadId ?? input.externalId;
-  const minutesSpent = parseMinutesSpent(input.payload.minutesSpent, outbound ? 14 : 7);
+  const historyId = asOptionalString(input.payload.historyId);
+
+  // Use explicit workflowHint if present (fixtures), otherwise auto-derive from subject
+  const explicitHint = asOptionalString(input.payload.workflowHint);
+  const workflowHint = explicitHint ?? deriveGmailWorkflowHint(subject, labelIds);
+
+  const parsedSequence = parseSequence(input.payload.sequence);
+  const sequence = parsedSequence ?? (outbound ? 3 : 1);
+
+  const explicitRunKey = asOptionalString(input.payload.runKey);
+  const runKey = explicitRunKey ?? threadId ?? input.externalId;
+  const minutesSpent = parseMinutesSpent(input.payload.minutesSpent, outbound ? 8 : 3);
 
   return {
-    actor: outbound ? 'support-agent' : 'customer',
+    actor: outbound ? (from ?? 'outbound-sender') : (from ?? 'inbound-sender'),
     tool: 'Gmail',
-    action: inferAction(sequence),
+    action: outbound ? 'send_reply' : 'receive_email',
     channel: null,
     payload: {
       workflowHint,
@@ -185,8 +241,8 @@ function normalizeGmail(input: {
         labelIds
       }
     },
-    malformed: input.errors.length > 0,
-    failureReason: input.errors.length > 0 ? input.errors.join(' ') : null
+    malformed: false,
+    failureReason: null
   };
 }
 
@@ -365,6 +421,76 @@ function normalizeJira(input: {
   };
 }
 
+function deriveGCalWorkflowHint(title: string): string {
+  if (!title) return 'gcal-meeting';
+
+  const pattern = title
+    .replace(/\d{1,4}[\/\-\.]\d{1,2}[\/\-\.]\d{1,4}/g, '') // dates
+    .replace(/\b\d{4,}\b/g, '')   // long numbers
+    .replace(/#\d+/g, '')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .toLowerCase();
+
+  const words = pattern.split(/\s+/).filter(w => w.length > 1).slice(0, 4);
+  if (words.length === 0) return 'gcal-meeting';
+
+  const slug = words.join('-').replace(/[^a-z0-9-]/g, '').replace(/-+/g, '-').slice(0, 35);
+  return `gcal-${slug || 'meeting'}`;
+}
+
+function normalizeGCal(input: {
+  externalId: string;
+  payload: Record<string, unknown>;
+  errors: string[];
+}): CanonicalNormalizedEvent {
+  const title = (typeof input.payload.title === 'string' ? input.payload.title : '') as string;
+
+  const explicitHint = typeof input.payload.workflowHint === 'string' ? input.payload.workflowHint : null;
+  const workflowHint = explicitHint ?? deriveGCalWorkflowHint(title);
+
+  const sequence = parseSequence(input.payload.sequence) ?? 1;
+  const durationMinutes = parseMinutesSpent(input.payload.durationMinutes, 30);
+  const attendeeCount = typeof input.payload.attendeeCount === 'number' ? input.payload.attendeeCount : 0;
+  const isRecurring = Boolean(input.payload.isRecurring);
+
+  // Use recurring event ID or title pattern + week as runKey
+  const explicitRunKey = typeof input.payload.runKey === 'string' ? input.payload.runKey : null;
+  const runKey = explicitRunKey ?? input.externalId;
+  const minutesSpent = parseMinutesSpent(input.payload.minutesSpent, durationMinutes);
+  const channel = asOptionalString(input.payload.channel);
+
+  // Determine action based on meeting characteristics
+  const action = attendeeCount > 5 ? 'large_meeting'
+    : durationMinutes >= 60 ? 'long_meeting'
+      : isRecurring ? 'recurring_meeting'
+        : 'meeting';
+
+  return {
+    actor: asOptionalString(input.payload.organizer) ?? 'unknown',
+    tool: 'GCal',
+    action,
+    channel,
+    payload: {
+      workflowHint,
+      sequence,
+      runKey,
+      minutesSpent,
+      source: {
+        provider: 'GCAL',
+        title,
+        durationMinutes,
+        attendeeCount,
+        organizer: asOptionalString(input.payload.organizer),
+        isRecurring,
+        hasVideoConference: Boolean(input.payload.hasVideoConference)
+      }
+    },
+    malformed: false,
+    failureReason: null
+  };
+}
+
 export function normalizeRawConnectorEvent(
   input: NormalizeRawConnectorEventInput
 ): CanonicalNormalizedEvent {
@@ -391,6 +517,10 @@ export function normalizeRawConnectorEvent(
     return normalizeJira({ externalId: input.externalId, payload, errors });
   }
 
-  // Default: GMAIL (and GCAL fallback)
+  if (input.provider === 'GCAL') {
+    return normalizeGCal({ externalId: input.externalId, payload, errors });
+  }
+
+  // Default: GMAIL
   return normalizeGmail({ externalId: input.externalId, payload, errors });
 }

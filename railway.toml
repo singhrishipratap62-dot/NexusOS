@@ -1,0 +1,13 @@
+[build]
+builder = "nixpacks"
+buildCommand = "pnpm install && pnpm --filter @nexus/contracts build && pnpm --filter @nexus/shared build && pnpm --filter @nexus/api build && pnpm --filter @nexus/workers build"
+
+[deploy]
+startCommand = "pnpm prisma:migrate && pnpm --filter @nexus/api start"
+healthcheckPath = "/health"
+healthcheckTimeout = 100
+restartPolicyType = "on_failure"
+
+[env]
+PORT = "3000"
+NODE_ENV = "production"

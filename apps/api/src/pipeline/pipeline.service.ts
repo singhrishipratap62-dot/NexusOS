@@ -29,6 +29,7 @@ import {
 } from '@nexus/shared';
 import { FeasibilityService } from '../scoring/feasibility.service';
 import { PrismaService } from '../prisma/prisma.service';
+import { TriggerEvaluatorService } from '../automation/trigger-evaluator.service';
 
 function computeVarianceRatio(values: number[]): number {
   if (values.length < 2) {
@@ -50,8 +51,9 @@ export class PipelineService {
 
   constructor(
     private readonly prisma: PrismaService,
-    private readonly feasibilityService: FeasibilityService
-  ) {}
+    private readonly feasibilityService: FeasibilityService,
+    private readonly triggerEvaluator: TriggerEvaluatorService
+  ) { }
 
   async ensureTenant(tenantId: string): Promise<void> {
     await this.prisma.tenant.upsert({
@@ -910,6 +912,17 @@ export class PipelineService {
 
     const slackNormalization = await this.normalizeProviderEvents(tenantId, 'SLACK');
     const gmailNormalization = await this.normalizeProviderEvents(tenantId, 'GMAIL');
+
+    // Evaluate triggers after normalization — auto-enqueue agent runs for matching events
+    const syncTimestamp = new Date(Date.now() - 5 * 60 * 1000); // look back 5min
+    const triggers = await Promise.all([
+      this.triggerEvaluator.evaluateNewEvents(tenantId, 'SLACK', syncTimestamp),
+      this.triggerEvaluator.evaluateNewEvents(tenantId, 'GMAIL', syncTimestamp)
+    ]);
+    const totalTriggered = triggers.flat().length;
+    if (totalTriggered > 0) {
+      this.logger.log(`Auto-triggered ${totalTriggered} agent runs from new events`);
+    }
 
     const workflowResult = await this.extractAndScore(tenantId);
 

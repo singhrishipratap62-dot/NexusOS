@@ -22,7 +22,7 @@ import { requireTenantContext, TenantRequest } from '../common/tenant-request';
 @Controller('automation')
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class AutomationController {
-  constructor(private readonly automationService: AutomationService) {}
+  constructor(private readonly automationService: AutomationService) { }
 
   @Post('blueprints')
   @Roles(UserRole.ANALYST, UserRole.ADMIN)
@@ -66,7 +66,13 @@ export class AutomationController {
   @Roles(UserRole.ANALYST, UserRole.ADMIN)
   async runBlueprint(@Req() request: TenantRequest, @Param('id') id: string): Promise<AutomationRun> {
     const { tenantId, actorId } = requireTenantContext(request);
-    return this.automationService.createRun(tenantId, id, actorId);
+    const run = await this.automationService.createRun(tenantId, id, actorId);
+    // Execute the run asynchronously (don't await — return immediately)
+    this.automationService.executeRun(tenantId, run.id).catch((err) => {
+      // Error is logged inside executeRun; this catch prevents unhandled promise rejection
+      console.error(`Run ${run.id} execution failed:`, err);
+    });
+    return run;
   }
 
   @Get('runs')
@@ -79,5 +85,42 @@ export class AutomationController {
   async getRun(@Req() request: TenantRequest, @Param('id') id: string): Promise<AutomationRun> {
     const { tenantId } = requireTenantContext(request);
     return this.automationService.getRun(tenantId, id);
+  }
+
+  @Post('runs/:id/cancel')
+  async cancelRun(@Req() request: TenantRequest, @Param('id') id: string): Promise<AutomationRun> {
+    const { tenantId } = requireTenantContext(request);
+    return this.automationService.cancelRun(tenantId, id);
+  }
+
+  /**
+   * Approve a HITL-paused step and continue execution
+   */
+  @Post('runs/:id/approve-step/:stepIndex')
+  @Roles(UserRole.ANALYST, UserRole.ADMIN)
+  async approveStep(
+    @Req() request: TenantRequest,
+    @Param('id') id: string,
+    @Param('stepIndex') stepIndex: string
+  ) {
+    const { tenantId } = requireTenantContext(request);
+    return this.automationService.approveStep(tenantId, id, parseInt(stepIndex, 10));
+  }
+
+  /**
+   * Toggle auto-execute on a blueprint
+   */
+  @Put('blueprints/:id/auto-execute')
+  @Roles(UserRole.ADMIN)
+  async toggleAutoExecute(
+    @Req() request: TenantRequest,
+    @Param('id') id: string,
+    @Body() body: { autoExecute: boolean; confidenceThreshold?: number }
+  ) {
+    const { tenantId } = requireTenantContext(request);
+    return this.automationService.updateBlueprint(tenantId, id, {
+      autoExecute: body.autoExecute,
+      confidenceThreshold: body.confidenceThreshold ?? 0.85
+    } as any);
   }
 }

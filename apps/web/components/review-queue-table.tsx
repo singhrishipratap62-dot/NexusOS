@@ -113,7 +113,7 @@ export function ReviewQueueTable({
     setModal(null);
 
     try {
-      await fetch(`/api/review/${item.workflowId}/decision`, {
+      await fetch(`/api/proxy?path=/review-queue/${item.workflowId}/decision`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

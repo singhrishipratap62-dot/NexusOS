@@ -59,6 +59,12 @@ services:
       AUTH_STATIC_TOKEN: day1-mvp-token
       DATABASE_URL: postgresql://postgres:postgres@postgres:5432/nexusos
       REDIS_URL: redis://redis:6379
+      # ⚠️  Override these via .env file or shell env before running docker compose.
+      # Generate secrets with: openssl rand -hex 32
+      JWT_SECRET: ${JWT_SECRET:-change-me-generate-with-openssl-rand-hex-32}
+      TOKEN_ENCRYPTION_KEY: ${TOKEN_ENCRYPTION_KEY:-change-me-generate-with-openssl-rand-hex-32}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:3001}
       BLENDED_HOURLY_RATE: 95
       IMPLEMENTATION_COST_DEFAULT: 18000
       ANNUAL_PLATFORM_COST: 4800
@@ -94,6 +100,8 @@ services:
       SINGLE_TENANT_ID: tenant_day1
       DATABASE_URL: postgresql://postgres:postgres@postgres:5432/nexusos
       REDIS_URL: redis://redis:6379
+      TOKEN_ENCRYPTION_KEY: ${TOKEN_ENCRYPTION_KEY:-change-me-generate-with-openssl-rand-hex-32}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
       BLENDED_HOURLY_RATE: 95
       IMPLEMENTATION_COST_DEFAULT: 18000
       ANNUAL_PLATFORM_COST: 4800

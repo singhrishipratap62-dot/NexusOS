@@ -15,7 +15,10 @@ describe('smoke flow: ingest -> normalize -> workflow -> score -> dashboard', ()
     process.env.ENABLE_LLM_RATIONALE = 'false';
 
     const prisma = new InMemoryPrismaService();
-    const pipeline = new PipelineService(prisma as never, new FeasibilityService());
+    const mockTriggerEvaluator = {
+      evaluateNewEvents: async () => []
+    };
+    const pipeline = new PipelineService(prisma as never, new FeasibilityService(), mockTriggerEvaluator as never);
     const warRoom = new WarRoomService(prisma as never);
 
     const firstRun = await pipeline.runSeededAudit('tenant_day1');

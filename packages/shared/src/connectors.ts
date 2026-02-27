@@ -416,3 +416,87 @@ export function loadGmailAuditFixtures(): RawConnectorEvent[] {
 
   return events;
 }
+
+export function loadGCalAuditFixtures(): RawConnectorEvent[] {
+  const events: RawConnectorEvent[] = [];
+
+  // Daily standups
+  for (let run = 1; run <= 20; run++) {
+    const day = run % 28;
+    const runKey = `standup-${run}`;
+    events.push({
+      provider: 'GCAL',
+      externalId: `gcal-standup-${run}`,
+      occurredAt: daysAgo(day, 0),
+      actor: 'eng-manager',
+      channel: 'Engineering Calendar',
+      payload: {
+        type: 'calendar_event',
+        title: 'Daily Standup',
+        durationMinutes: 15,
+        attendeeCount: 6,
+        organizer: 'eng-manager@company.com',
+        isRecurring: true,
+        hasVideoConference: true,
+        workflowHint: 'daily-standup-workflow',
+        sequence: 1,
+        runKey,
+        minutesSpent: 15
+      }
+    });
+  }
+
+  // Sprint planning
+  for (let run = 1; run <= 4; run++) {
+    const day = run * 7;
+    const runKey = `sprint-planning-${run}`;
+    events.push({
+      provider: 'GCAL',
+      externalId: `gcal-sprint-${run}`,
+      occurredAt: daysAgo(day, 2),
+      actor: 'scrum-master',
+      channel: 'Engineering Calendar',
+      payload: {
+        type: 'calendar_event',
+        title: 'Sprint Planning',
+        durationMinutes: 60,
+        attendeeCount: 8,
+        organizer: 'scrum-master@company.com',
+        isRecurring: true,
+        hasVideoConference: true,
+        workflowHint: 'sprint-ceremony-workflow',
+        sequence: 1,
+        runKey,
+        minutesSpent: 60
+      }
+    });
+  }
+
+  // 1:1s
+  for (let run = 1; run <= 8; run++) {
+    const day = (run * 3) % 28;
+    const runKey = `one-on-one-${run}`;
+    events.push({
+      provider: 'GCAL',
+      externalId: `gcal-1on1-${run}`,
+      occurredAt: daysAgo(day, 4),
+      actor: 'eng-manager',
+      channel: 'Engineering Calendar',
+      payload: {
+        type: 'calendar_event',
+        title: `1:1 with Engineer ${run}`,
+        durationMinutes: 30,
+        attendeeCount: 2,
+        organizer: 'eng-manager@company.com',
+        isRecurring: true,
+        hasVideoConference: true,
+        workflowHint: 'one-on-one-workflow',
+        sequence: 1,
+        runKey,
+        minutesSpent: 30
+      }
+    });
+  }
+
+  return events;
+}

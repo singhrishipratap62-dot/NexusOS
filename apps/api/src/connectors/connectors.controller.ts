@@ -2,11 +2,18 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Delete,
   Get,
+  HttpCode,
+  HttpStatus,
   Param,
   Post,
-  Req
+  Req,
+  Query,
+  Res
 } from '@nestjs/common';
+import { Response } from 'express';
+import { Public } from '../auth/public.decorator';
 import { Provider } from '@prisma/client';
 import { requireTenantContext, TenantRequest } from '../common/tenant-request';
 import { ConnectorsService } from './connectors.service';
@@ -16,7 +23,8 @@ import {
   JiraOAuthExchangeDto,
   LinearOAuthExchangeDto,
   NotionOAuthExchangeDto,
-  SlackOAuthExchangeDto
+  SlackOAuthExchangeDto,
+  GCalOAuthExchangeDto
 } from './connectors.dto';
 
 const VALID_PROVIDERS = new Set<string>([
@@ -39,7 +47,7 @@ function parseProvider(input: string): Provider {
 
 @Controller('connectors')
 export class ConnectorsController {
-  constructor(private readonly connectorsService: ConnectorsService) {}
+  constructor(private readonly connectorsService: ConnectorsService) { }
 
   @Get()
   async list(@Req() request: TenantRequest): Promise<unknown> {
@@ -61,6 +69,34 @@ export class ConnectorsController {
     return this.connectorsService.getSlackOAuthStartUrl(tenantContext.tenantId);
   }
 
+  @Public()
+  @Get('slack/oauth/callback')
+  async handleSlackOAuthCallback(
+    @Query('code') code: string,
+    @Query('state') state: string,
+    @Res() res: Response
+  ) {
+    const webUrl = process.env.WEB_URL ?? 'http://localhost:3001';
+    if (!code || !state) {
+      return res.redirect(`${webUrl}/connectors?error=missing_oauth_params`);
+    }
+
+    try {
+      const parsed = JSON.parse(Buffer.from(state, 'base64url').toString('utf-8'));
+      if (!parsed.tenantId) throw new Error('Missing tenantId in state');
+
+      await this.connectorsService.exchangeSlackOAuthCode({
+        tenantId: parsed.tenantId,
+        code,
+        state
+      });
+
+      return res.redirect(`${webUrl}/connectors?success=true`);
+    } catch (err) {
+      return res.redirect(`${webUrl}/connectors?error=oauth_failed`);
+    }
+  }
+
   @Post('slack/oauth/exchange')
   async exchangeSlackOAuthCode(
     @Req() request: TenantRequest,
@@ -69,7 +105,8 @@ export class ConnectorsController {
     const tenantContext = requireTenantContext(request);
     return this.connectorsService.exchangeSlackOAuthCode({
       tenantId: tenantContext.tenantId,
-      code: dto.code
+      code: dto.code,
+      state: dto.state
     });
   }
 
@@ -81,6 +118,34 @@ export class ConnectorsController {
     return this.connectorsService.getGmailOAuthStartUrl(tenantContext.tenantId);
   }
 
+  @Public()
+  @Get('gmail/oauth/callback')
+  async handleGmailOAuthCallback(
+    @Query('code') code: string,
+    @Query('state') state: string,
+    @Res() res: Response
+  ) {
+    const webUrl = process.env.WEB_URL ?? 'http://localhost:3001';
+    if (!code || !state) {
+      return res.redirect(`${webUrl}/connectors?error=missing_oauth_params`);
+    }
+
+    try {
+      const parsed = JSON.parse(Buffer.from(state, 'base64url').toString('utf-8'));
+      if (!parsed.tenantId) throw new Error('Missing tenantId in state');
+
+      await this.connectorsService.exchangeGmailOAuthCode({
+        tenantId: parsed.tenantId,
+        code,
+        state
+      });
+
+      return res.redirect(`${webUrl}/connectors?success=true`);
+    } catch (err) {
+      return res.redirect(`${webUrl}/connectors?error=oauth_failed`);
+    }
+  }
+
   @Post('gmail/oauth/exchange')
   async exchangeGmailOAuthCode(
     @Req() request: TenantRequest,
@@ -89,7 +154,8 @@ export class ConnectorsController {
     const tenantContext = requireTenantContext(request);
     return this.connectorsService.exchangeGmailOAuthCode({
       tenantId: tenantContext.tenantId,
-      code: dto.code
+      code: dto.code,
+      state: dto.state
     });
   }
 
@@ -109,7 +175,8 @@ export class ConnectorsController {
     const tenantContext = requireTenantContext(request);
     return this.connectorsService.exchangeGitHubOAuthCode({
       tenantId: tenantContext.tenantId,
-      code: dto.code
+      code: dto.code,
+      state: dto.state
     });
   }
 
@@ -129,7 +196,8 @@ export class ConnectorsController {
     const tenantContext = requireTenantContext(request);
     return this.connectorsService.exchangeNotionOAuthCode({
       tenantId: tenantContext.tenantId,
-      code: dto.code
+      code: dto.code,
+      state: dto.state
     });
   }
 
@@ -149,7 +217,8 @@ export class ConnectorsController {
     const tenantContext = requireTenantContext(request);
     return this.connectorsService.exchangeLinearOAuthCode({
       tenantId: tenantContext.tenantId,
-      code: dto.code
+      code: dto.code,
+      state: dto.state
     });
   }
 
@@ -169,8 +238,43 @@ export class ConnectorsController {
     const tenantContext = requireTenantContext(request);
     return this.connectorsService.exchangeJiraOAuthCode({
       tenantId: tenantContext.tenantId,
-      code: dto.code
+      code: dto.code,
+      state: dto.state
     });
+  }
+
+  // ── Google Calendar ────────────────────────────────────────────────────────
+
+  @Get('gcal/oauth/start')
+  getGCalOAuthStart(@Req() request: TenantRequest): { url: string; state: string } {
+    const tenantContext = requireTenantContext(request);
+    return this.connectorsService.getGCalOAuthStartUrl(tenantContext.tenantId);
+  }
+
+  @Post('gcal/oauth/exchange')
+  async exchangeGCalOAuthCode(
+    @Req() request: TenantRequest,
+    @Body() dto: GCalOAuthExchangeDto
+  ): Promise<unknown> {
+    const tenantContext = requireTenantContext(request);
+    return this.connectorsService.exchangeGCalOAuthCode({
+      tenantId: tenantContext.tenantId,
+      code: dto.code,
+      state: dto.state
+    });
+  }
+
+  // ── Disconnect ─────────────────────────────────────────────────────────────
+
+  @Delete(':provider')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async disconnect(
+    @Param('provider') providerInput: string,
+    @Req() request: TenantRequest
+  ): Promise<void> {
+    const provider = parseProvider(providerInput);
+    const tenantContext = requireTenantContext(request);
+    await this.connectorsService.disconnectConnector(tenantContext.tenantId, provider);
   }
 
   // ── Generic sync trigger ──────────────────────────────────────────────────

@@ -11,3 +11,4 @@ export * from './jira-readonly';
 export * from './event-hash';
 export * from './normalization';
 export * from './token-encryption';
+export * from './gcal-readonly';

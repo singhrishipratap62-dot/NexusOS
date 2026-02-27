@@ -1,0 +1,188 @@
+
+> nexusos-day1-mvp@0.1.0 dev:api /Users/rishi/Documents/NexusOS
+> pnpm --filter @nexus/contracts build && pnpm --filter @nexus/shared build && pnpm --filter @nexus/api dev
+
+
+> @nexus/contracts@0.1.0 build /Users/rishi/Documents/NexusOS/packages/contracts
+> tsc -p tsconfig.json
+
+
+> @nexus/shared@0.1.0 build /Users/rishi/Documents/NexusOS/packages/shared
+> tsc -p tsconfig.json
+
+
+> @nexus/api@0.1.0 dev /Users/rishi/Documents/NexusOS/apps/api
+> ts-node --swc -r reflect-metadata -r dotenv/config src/main.ts dotenv_config_path=.env
+
+⚠️  OAuth connectors unavailable (env vars not set):
+  - GitHub (GITHUB_CLIENT_ID / GITHUB_CLIENT_SECRET)
+[32m[Nest] 71896  - [39m02/26/2026, 6:35:03 PM [32m    LOG[39m [38;5;3m[NestFactory] [39m[32mStarting Nest application...[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:35:03 PM [32m    LOG[39m [38;5;3m[LlmService] [39m[32mOpenAI client initialized (baseURL: https://integrate.api.nvidia.com/v1)[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:35:03 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mAiModule dependencies initialized[39m[38;5;3m +23ms[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:35:03 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mAppModule dependencies initialized[39m[38;5;3m +29ms[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:35:03 PM [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mHealthController {/health}:[39m[38;5;3m +17ms[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:35:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/health, GET} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:35:03 PM [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mAuthController {/auth}:[39m[38;5;3m +0ms[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:35:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/auth/register, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:35:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/auth/login, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:35:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/auth/refresh, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:35:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/auth/logout, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:35:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/auth/me, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:35:03 PM [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mConnectorsController {/connectors}:[39m[38;5;3m +1ms[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:35:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/connectors, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:35:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/connectors/sync-jobs, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:35:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/connectors/slack/oauth/start, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:35:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/connectors/slack/oauth/callback, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:35:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/connectors/slack/oauth/exchange, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:35:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/connectors/gmail/oauth/start, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:35:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/connectors/gmail/oauth/callback, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:35:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/connectors/gmail/oauth/exchange, POST} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:35:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/connectors/github/oauth/start, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:35:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/connectors/github/oauth/exchange, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:35:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/connectors/notion/oauth/start, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:35:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/connectors/notion/oauth/exchange, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:35:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/connectors/linear/oauth/start, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:35:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/connectors/linear/oauth/exchange, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:35:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/connectors/jira/oauth/start, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:35:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/connectors/jira/oauth/exchange, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:35:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/connectors/gcal/oauth/start, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:35:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/connectors/gcal/oauth/exchange, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:35:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/connectors/:provider, DELETE} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:35:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/connectors/:provider/sync, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:35:03 PM [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mPipelineController {/pipeline}:[39m[38;5;3m +0ms[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:35:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/pipeline/run-seeded, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:35:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/pipeline/extract-and-score, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:35:03 PM [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mTenantsController {/tenants}:[39m[38;5;3m +0ms[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:35:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/tenants/me, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:35:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/tenants/me/members, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:35:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/tenants/me/invite, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:35:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/tenants/me/members/:userId/role, POST} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:35:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/tenants, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:35:03 PM [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mWarRoomController {/war-room}:[39m[38;5;3m +0ms[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:35:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/war-room/opportunities, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:35:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/war-room/executive-summary, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:35:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/war-room/bleed-map, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:35:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/war-room/ai-vs-human, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:35:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/war-room/workflow/:id, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:35:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/war-room/deploy-agent/:workflowId, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:35:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/war-room/events, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:35:03 PM [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mReviewController {/review-queue}:[39m[38;5;3m +0ms[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:35:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/review-queue, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:35:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/review-queue/:workflowId/decision, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:35:03 PM [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mAutomationController {/automation}:[39m[38;5;3m +0ms[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:35:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/automation/blueprints, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:35:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/automation/blueprints, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:35:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/automation/blueprints/:id, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:35:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/automation/blueprints/:id, PUT} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:35:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/automation/blueprints/:id, DELETE} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:35:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/automation/blueprints/:id/run, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:35:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/automation/runs, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:35:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/automation/runs/:id, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:35:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/automation/runs/:id/cancel, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:35:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/automation/runs/:id/approve-step/:stepIndex, POST} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:35:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/automation/blueprints/:id/auto-execute, PUT} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:35:03 PM [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mAgentsController {/agents}:[39m[38;5;3m +0ms[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:35:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/agents, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:35:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/agents/:id, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:35:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/agents/:id/pause, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:35:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/agents/:id/resume, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:35:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/agents/:id/retrain, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:35:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/agents/:id/persona, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:35:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/agents/:id/memories, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:35:03 PM [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mAiAnalysisController {/ai}:[39m[38;5;3m +0ms[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:35:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/ai/analyze/:workflowId, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:35:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/ai/analysis/:workflowId, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:35:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/ai/analyze-all, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:35:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/ai/status, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:35:03 PM [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mAiController {/ai}:[39m[38;5;3m +0ms[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:35:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/ai/chat, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:35:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/ai/generate-blueprint/:workflowId, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:35:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/ai/refine-blueprint/:blueprintId, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:35:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/ai/chat/:conversationId, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:35:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/ai/outcomes/:blueprintId, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:35:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/ai/outcomes, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:35:03 PM [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mChainController {/chains}:[39m[38;5;3m +0ms[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:35:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/chains, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:35:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/chains, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:35:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/chains/:id, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:35:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/chains/:id, PUT} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:35:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/chains/:id/run, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:35:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/chains/:id/retry/:runId, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:35:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/chains/:id/runs, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:35:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/chains/:id/metrics, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:35:03 PM [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mDemoController {/demo}:[39m[38;5;3m +0ms[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:35:03 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/demo/seed, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:35:08 PM [32m    LOG[39m [38;5;3m[NestApplication] [39m[32mNest application successfully started[39m[38;5;3m +5281ms[39m
+NexusOS API listening on 0.0.0.0:3000
+[33m[Nest] 71896  - [39m02/26/2026, 6:35:13 PM [33m   WARN[39m [38;5;3m[HTTP] [39m[33m{"correlationId":"cbb8b07e-8f6d-41d0-870a-9eb436069773","method":"POST","path":"/ai/chat","statusCode":401,"durationMs":21,"tenantId":"-","userId":"-","userAgent":"curl/8.7.1","ip":"127.0.0.1"}[39m
+[33m[Nest] 71896  - [39m02/26/2026, 6:39:45 PM [33m   WARN[39m [38;5;3m[HTTP] [39m[33m{"correlationId":"fd857687-abc1-4cf9-a8e0-94e3ab6b1d02","method":"POST","path":"/ai/chat","statusCode":401,"durationMs":98,"tenantId":"-","userId":"-","userAgent":"node","ip":"127.0.0.1"}[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:44:18 PM [32m    LOG[39m [38;5;3m[HTTP] [39m[32m{"correlationId":"87e52eb0-1911-4360-99e7-8844eb69eae4","method":"POST","path":"/auth/login","statusCode":200,"durationMs":4400,"tenantId":"-","userId":"-","userAgent":"node","ip":"127.0.0.1"}[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:44:24 PM [32m    LOG[39m [38;5;3m[HTTP] [39m[32m{"correlationId":"7d47d8b3-5be1-44c7-bdbe-0e062a76f5d9","method":"GET","path":"/war-room/opportunities?includeNeedsReview=true&sortBy=priority&sortDir=desc&limit=50","statusCode":200,"durationMs":597,"tenantId":"cmm3azdtj000hrthsz3wqn1z5","userId":"cmm3azdlm000grths7rhioqc8","userAgent":"node","ip":"127.0.0.1"}[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:44:27 PM [32m    LOG[39m [38;5;3m[HTTP] [39m[32m{"correlationId":"167372ca-cc2f-4f45-acf4-3ae823a9146d","method":"GET","path":"/war-room/bleed-map","statusCode":200,"durationMs":2689,"tenantId":"cmm3azdtj000hrthsz3wqn1z5","userId":"cmm3azdlm000grths7rhioqc8","userAgent":"node","ip":"127.0.0.1"}[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:44:27 PM [32m    LOG[39m [38;5;3m[HTTP] [39m[32m{"correlationId":"2b44ebc0-8001-447b-8934-284dd33c827a","method":"GET","path":"/war-room/ai-vs-human","statusCode":200,"durationMs":2777,"tenantId":"cmm3azdtj000hrthsz3wqn1z5","userId":"cmm3azdlm000grths7rhioqc8","userAgent":"node","ip":"127.0.0.1"}[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:44:27 PM [32m    LOG[39m [38;5;3m[HTTP] [39m[32m{"correlationId":"eb7a6c75-8834-4908-b68e-b1af8759124f","method":"GET","path":"/war-room/opportunities?includeNeedsReview=true&sortBy=priority&sortDir=desc&limit=50","statusCode":200,"durationMs":2462,"tenantId":"cmm3azdtj000hrthsz3wqn1z5","userId":"cmm3azdlm000grths7rhioqc8","userAgent":"node","ip":"127.0.0.1"}[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:44:27 PM [32m    LOG[39m [38;5;3m[HTTP] [39m[32m{"correlationId":"828f03c8-4b28-4768-9e9d-0e29a92831df","method":"GET","path":"/war-room/bleed-map","statusCode":200,"durationMs":537,"tenantId":"cmm3azdtj000hrthsz3wqn1z5","userId":"cmm3azdlm000grths7rhioqc8","userAgent":"node","ip":"127.0.0.1"}[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:44:27 PM [32m    LOG[39m [38;5;3m[HTTP] [39m[32m{"correlationId":"55aca83c-5d90-418c-9d94-e1fbd10e3a99","method":"GET","path":"/war-room/ai-vs-human","statusCode":200,"durationMs":536,"tenantId":"cmm3azdtj000hrthsz3wqn1z5","userId":"cmm3azdlm000grths7rhioqc8","userAgent":"node","ip":"127.0.0.1"}[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:44:28 PM [32m    LOG[39m [38;5;3m[HTTP] [39m[32m{"correlationId":"8daac159-71a0-4ff7-8b65-9d1afd042856","method":"GET","path":"/war-room/executive-summary","statusCode":200,"durationMs":4342,"tenantId":"cmm3azdtj000hrthsz3wqn1z5","userId":"cmm3azdlm000grths7rhioqc8","userAgent":"node","ip":"127.0.0.1"}[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:44:29 PM [32m    LOG[39m [38;5;3m[HTTP] [39m[32m{"correlationId":"18961535-f24d-414e-b2cc-d8b8bb6bb11d","method":"GET","path":"/war-room/executive-summary","statusCode":200,"durationMs":1101,"tenantId":"cmm3azdtj000hrthsz3wqn1z5","userId":"cmm3azdlm000grths7rhioqc8","userAgent":"node","ip":"127.0.0.1"}[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:44:34 PM [32m    LOG[39m [38;5;3m[HTTP] [39m[32m{"correlationId":"c25b9820-c465-4cd9-ada3-3c14f85fb312","method":"GET","path":"/connectors","statusCode":200,"durationMs":1088,"tenantId":"cmm3azdtj000hrthsz3wqn1z5","userId":"cmm3azdlm000grths7rhioqc8","userAgent":"node","ip":"127.0.0.1"}[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:44:34 PM [32m    LOG[39m [38;5;3m[HTTP] [39m[32m{"correlationId":"124f8041-c4cf-4f08-b130-65026d20433b","method":"GET","path":"/connectors/sync-jobs","statusCode":200,"durationMs":1092,"tenantId":"cmm3azdtj000hrthsz3wqn1z5","userId":"cmm3azdlm000grths7rhioqc8","userAgent":"node","ip":"127.0.0.1"}[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:44:34 PM [32m    LOG[39m [38;5;3m[HTTP] [39m[32m{"correlationId":"38fcafee-8eb8-440a-a50c-65d14332ccc8","method":"GET","path":"/connectors","statusCode":200,"durationMs":1110,"tenantId":"cmm3azdtj000hrthsz3wqn1z5","userId":"cmm3azdlm000grths7rhioqc8","userAgent":"node","ip":"127.0.0.1"}[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:44:34 PM [32m    LOG[39m [38;5;3m[HTTP] [39m[32m{"correlationId":"cc797dc1-ae41-4faa-9f8b-3a3848b8de45","method":"GET","path":"/connectors/sync-jobs","statusCode":200,"durationMs":1104,"tenantId":"cmm3azdtj000hrthsz3wqn1z5","userId":"cmm3azdlm000grths7rhioqc8","userAgent":"node","ip":"127.0.0.1"}[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:44:35 PM [32m    LOG[39m [38;5;3m[HTTP] [39m[32m{"correlationId":"56092383-2f13-446f-b827-6c2ec5ff9123","method":"GET","path":"/connectors","statusCode":200,"durationMs":1102,"tenantId":"cmm3azdtj000hrthsz3wqn1z5","userId":"cmm3azdlm000grths7rhioqc8","userAgent":"node","ip":"127.0.0.1"}[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:44:38 PM [32m    LOG[39m [38;5;3m[HTTP] [39m[32m{"correlationId":"cf3c9e39-3316-437b-a8b8-18bab103ee29","method":"GET","path":"/connectors/sync-jobs","statusCode":200,"durationMs":3319,"tenantId":"cmm3azdtj000hrthsz3wqn1z5","userId":"cmm3azdlm000grths7rhioqc8","userAgent":"node","ip":"127.0.0.1"}[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:44:38 PM [32m    LOG[39m [38;5;3m[HTTP] [39m[32m{"correlationId":"3192f7af-0b5d-4be9-9ab7-9fb1a9c7cde7","method":"GET","path":"/connectors","statusCode":200,"durationMs":549,"tenantId":"cmm3azdtj000hrthsz3wqn1z5","userId":"cmm3azdlm000grths7rhioqc8","userAgent":"node","ip":"127.0.0.1"}[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:44:39 PM [32m    LOG[39m [38;5;3m[HTTP] [39m[32m{"correlationId":"57c5283d-6a27-43ab-9ce3-a06dadab84ae","method":"GET","path":"/connectors/sync-jobs","statusCode":200,"durationMs":4390,"tenantId":"cmm3azdtj000hrthsz3wqn1z5","userId":"cmm3azdlm000grths7rhioqc8","userAgent":"node","ip":"127.0.0.1"}[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:44:39 PM [32m    LOG[39m [38;5;3m[HTTP] [39m[32m{"correlationId":"1e0e4d83-cce6-4223-96db-3ca3f7483dd8","method":"GET","path":"/connectors","statusCode":200,"durationMs":4404,"tenantId":"cmm3azdtj000hrthsz3wqn1z5","userId":"cmm3azdlm000grths7rhioqc8","userAgent":"node","ip":"127.0.0.1"}[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:44:39 PM [32m    LOG[39m [38;5;3m[HTTP] [39m[32m{"correlationId":"96db89e7-77b1-4a52-ac63-a0f561f799d6","method":"GET","path":"/connectors/sync-jobs","statusCode":200,"durationMs":1087,"tenantId":"cmm3azdtj000hrthsz3wqn1z5","userId":"cmm3azdlm000grths7rhioqc8","userAgent":"node","ip":"127.0.0.1"}[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:44:45 PM [32m    LOG[39m [38;5;3m[AiController] [39m[32m[Chat] About to call llm.completeJSON for conv conv_1772110355907 with 7 messages[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:44:45 PM [32m    LOG[39m [38;5;3m[LlmService] [39m[32m[LLM] Attempt 1/3 to call model moonshotai/kimi-k2.5[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:45:28 PM [32m    LOG[39m [38;5;3m[HTTP] [39m[32m{"correlationId":"5eb82496-88f5-4084-a0ba-4644841761db","method":"GET","path":"/agents","statusCode":200,"durationMs":572,"tenantId":"cmm3azdtj000hrthsz3wqn1z5","userId":"cmm3azdlm000grths7rhioqc8","userAgent":"node","ip":"127.0.0.1"}[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:45:28 PM [32m    LOG[39m [38;5;3m[HTTP] [39m[32m{"correlationId":"53e15f35-2bc8-4adc-970f-7cb08110b3d2","method":"GET","path":"/agents","statusCode":200,"durationMs":647,"tenantId":"cmm3azdtj000hrthsz3wqn1z5","userId":"cmm3azdlm000grths7rhioqc8","userAgent":"node","ip":"127.0.0.1"}[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:45:28 PM [32m    LOG[39m [38;5;3m[HTTP] [39m[32m{"correlationId":"297d42b1-b415-4dad-9773-d50aef8fb27b","method":"GET","path":"/agents","statusCode":200,"durationMs":576,"tenantId":"cmm3azdtj000hrthsz3wqn1z5","userId":"cmm3azdlm000grths7rhioqc8","userAgent":"node","ip":"127.0.0.1"}[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:45:29 PM [32m    LOG[39m [38;5;3m[HTTP] [39m[32m{"correlationId":"a229129a-15fc-4caa-8e4d-5ce4b867d6c5","method":"GET","path":"/agents","statusCode":200,"durationMs":308,"tenantId":"cmm3azdtj000hrthsz3wqn1z5","userId":"cmm3azdlm000grths7rhioqc8","userAgent":"node","ip":"127.0.0.1"}[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:45:29 PM [32m    LOG[39m [38;5;3m[HTTP] [39m[32m{"correlationId":"3ca13fb0-9e4a-48f8-b826-8f5390244130","method":"GET","path":"/agents","statusCode":200,"durationMs":296,"tenantId":"cmm3azdtj000hrthsz3wqn1z5","userId":"cmm3azdlm000grths7rhioqc8","userAgent":"node","ip":"127.0.0.1"}[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:45:30 PM [32m    LOG[39m [38;5;3m[HTTP] [39m[32m{"correlationId":"8d62c009-4d12-4bc2-be8b-ecc3de304e8b","method":"GET","path":"/ai/outcomes","statusCode":200,"durationMs":541,"tenantId":"cmm3azdtj000hrthsz3wqn1z5","userId":"cmm3azdlm000grths7rhioqc8","userAgent":"node","ip":"127.0.0.1"}[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:45:30 PM [32m    LOG[39m [38;5;3m[HTTP] [39m[32m{"correlationId":"7c3f7afa-ed9d-489d-921f-882e8d9fc19f","method":"GET","path":"/automation/blueprints","statusCode":200,"durationMs":808,"tenantId":"cmm3azdtj000hrthsz3wqn1z5","userId":"cmm3azdlm000grths7rhioqc8","userAgent":"node","ip":"127.0.0.1"}[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:45:30 PM [32m    LOG[39m [38;5;3m[HTTP] [39m[32m{"correlationId":"e48e6867-7818-4acb-98c3-c47832e17a62","method":"GET","path":"/automation/runs","statusCode":200,"durationMs":802,"tenantId":"cmm3azdtj000hrthsz3wqn1z5","userId":"cmm3azdlm000grths7rhioqc8","userAgent":"node","ip":"127.0.0.1"}[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:45:30 PM [32m    LOG[39m [38;5;3m[HTTP] [39m[32m{"correlationId":"1982e884-7886-466a-89e9-a2999dec32c6","method":"GET","path":"/automation/blueprints","statusCode":200,"durationMs":811,"tenantId":"cmm3azdtj000hrthsz3wqn1z5","userId":"cmm3azdlm000grths7rhioqc8","userAgent":"node","ip":"127.0.0.1"}[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:45:30 PM [32m    LOG[39m [38;5;3m[HTTP] [39m[32m{"correlationId":"a0abec57-7580-4d45-a121-be61a0d22c88","method":"GET","path":"/automation/runs","statusCode":200,"durationMs":815,"tenantId":"cmm3azdtj000hrthsz3wqn1z5","userId":"cmm3azdlm000grths7rhioqc8","userAgent":"node","ip":"127.0.0.1"}[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:45:30 PM [32m    LOG[39m [38;5;3m[HTTP] [39m[32m{"correlationId":"a8a93bf7-e3cd-4641-8dfa-358683488a9f","method":"GET","path":"/ai/outcomes","statusCode":200,"durationMs":269,"tenantId":"cmm3azdtj000hrthsz3wqn1z5","userId":"cmm3azdlm000grths7rhioqc8","userAgent":"node","ip":"127.0.0.1"}[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:45:30 PM [32m    LOG[39m [38;5;3m[HTTP] [39m[32m{"correlationId":"7b970df9-8777-4656-aae8-3b2893241eff","method":"GET","path":"/ai/outcomes","statusCode":200,"durationMs":272,"tenantId":"cmm3azdtj000hrthsz3wqn1z5","userId":"cmm3azdlm000grths7rhioqc8","userAgent":"node","ip":"127.0.0.1"}[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:45:31 PM [32m    LOG[39m [38;5;3m[HTTP] [39m[32m{"correlationId":"42650516-8597-4027-8576-66b07e9b874c","method":"GET","path":"/automation/blueprints","statusCode":200,"durationMs":534,"tenantId":"cmm3azdtj000hrthsz3wqn1z5","userId":"cmm3azdlm000grths7rhioqc8","userAgent":"node","ip":"127.0.0.1"}[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:45:31 PM [32m    LOG[39m [38;5;3m[HTTP] [39m[32m{"correlationId":"ff6ba908-ec62-4b97-8d6a-23a1e74e8cbb","method":"GET","path":"/automation/runs","statusCode":200,"durationMs":539,"tenantId":"cmm3azdtj000hrthsz3wqn1z5","userId":"cmm3azdlm000grths7rhioqc8","userAgent":"node","ip":"127.0.0.1"}[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:45:31 PM [32m    LOG[39m [38;5;3m[HTTP] [39m[32m{"correlationId":"58b5d288-49ff-4ea9-b261-6ba53d3da779","method":"GET","path":"/ai/outcomes","statusCode":200,"durationMs":280,"tenantId":"cmm3azdtj000hrthsz3wqn1z5","userId":"cmm3azdlm000grths7rhioqc8","userAgent":"node","ip":"127.0.0.1"}[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:45:31 PM [32m    LOG[39m [38;5;3m[HTTP] [39m[32m{"correlationId":"47c18f54-8be6-4e13-bb7d-ffa750fbe7d6","method":"GET","path":"/automation/blueprints","statusCode":200,"durationMs":547,"tenantId":"cmm3azdtj000hrthsz3wqn1z5","userId":"cmm3azdlm000grths7rhioqc8","userAgent":"node","ip":"127.0.0.1"}[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:45:31 PM [32m    LOG[39m [38;5;3m[HTTP] [39m[32m{"correlationId":"b9b3dd5f-215c-4674-a49e-6f9319fa642d","method":"GET","path":"/automation/blueprints","statusCode":200,"durationMs":548,"tenantId":"cmm3azdtj000hrthsz3wqn1z5","userId":"cmm3azdlm000grths7rhioqc8","userAgent":"node","ip":"127.0.0.1"}[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:45:31 PM [32m    LOG[39m [38;5;3m[HTTP] [39m[32m{"correlationId":"ec05bf18-ba46-492d-8385-16b045361c31","method":"GET","path":"/automation/runs","statusCode":200,"durationMs":548,"tenantId":"cmm3azdtj000hrthsz3wqn1z5","userId":"cmm3azdlm000grths7rhioqc8","userAgent":"node","ip":"127.0.0.1"}[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:45:31 PM [32m    LOG[39m [38;5;3m[HTTP] [39m[32m{"correlationId":"b9f06fbf-9d80-4d86-84c3-d2ec62be5533","method":"GET","path":"/automation/runs","statusCode":200,"durationMs":581,"tenantId":"cmm3azdtj000hrthsz3wqn1z5","userId":"cmm3azdlm000grths7rhioqc8","userAgent":"node","ip":"127.0.0.1"}[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:45:32 PM [32m    LOG[39m [38;5;3m[HTTP] [39m[32m{"correlationId":"04122a7b-688f-48f3-b366-000321d41522","method":"GET","path":"/ai/outcomes","statusCode":200,"durationMs":547,"tenantId":"cmm3azdtj000hrthsz3wqn1z5","userId":"cmm3azdlm000grths7rhioqc8","userAgent":"node","ip":"127.0.0.1"}[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:45:32 PM [32m    LOG[39m [38;5;3m[HTTP] [39m[32m{"correlationId":"f5cf95f6-f66b-405b-87d0-5b8dcb7339a8","method":"GET","path":"/ai/outcomes","statusCode":200,"durationMs":272,"tenantId":"cmm3azdtj000hrthsz3wqn1z5","userId":"cmm3azdlm000grths7rhioqc8","userAgent":"node","ip":"127.0.0.1"}[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:45:32 PM [32m    LOG[39m [38;5;3m[HTTP] [39m[32m{"correlationId":"69091907-2bd7-4afd-8946-cb83919311d5","method":"GET","path":"/automation/runs","statusCode":200,"durationMs":534,"tenantId":"cmm3azdtj000hrthsz3wqn1z5","userId":"cmm3azdlm000grths7rhioqc8","userAgent":"node","ip":"127.0.0.1"}[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:45:32 PM [32m    LOG[39m [38;5;3m[HTTP] [39m[32m{"correlationId":"f3234460-19c0-422c-b0b6-4ae0f76701ef","method":"GET","path":"/automation/blueprints","statusCode":200,"durationMs":536,"tenantId":"cmm3azdtj000hrthsz3wqn1z5","userId":"cmm3azdlm000grths7rhioqc8","userAgent":"node","ip":"127.0.0.1"}[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:45:34 PM [32m    LOG[39m [38;5;3m[HTTP] [39m[32m{"correlationId":"512a7c88-c754-43fd-8e02-2358e3500e4a","method":"GET","path":"/agents","statusCode":200,"durationMs":540,"tenantId":"cmm3azdtj000hrthsz3wqn1z5","userId":"cmm3azdlm000grths7rhioqc8","userAgent":"node","ip":"127.0.0.1"}[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:45:34 PM [32m    LOG[39m [38;5;3m[HTTP] [39m[32m{"correlationId":"ad4aa95d-df76-48ae-8ba3-f62265c5cc97","method":"GET","path":"/agents","statusCode":200,"durationMs":547,"tenantId":"cmm3azdtj000hrthsz3wqn1z5","userId":"cmm3azdlm000grths7rhioqc8","userAgent":"node","ip":"127.0.0.1"}[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:45:35 PM [32m    LOG[39m [38;5;3m[HTTP] [39m[32m{"correlationId":"e3fc9429-02de-418e-a8e3-be33295ead7e","method":"GET","path":"/agents","statusCode":200,"durationMs":536,"tenantId":"cmm3azdtj000hrthsz3wqn1z5","userId":"cmm3azdlm000grths7rhioqc8","userAgent":"node","ip":"127.0.0.1"}[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:45:35 PM [32m    LOG[39m [38;5;3m[HTTP] [39m[32m{"correlationId":"17de6f50-5cec-4f89-a36c-4174e7d7ccff","method":"GET","path":"/agents","statusCode":200,"durationMs":542,"tenantId":"cmm3azdtj000hrthsz3wqn1z5","userId":"cmm3azdlm000grths7rhioqc8","userAgent":"node","ip":"127.0.0.1"}[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:45:35 PM [32m    LOG[39m [38;5;3m[HTTP] [39m[32m{"correlationId":"c1cabed9-af24-4752-82ad-a882d315c7e4","method":"GET","path":"/agents","statusCode":200,"durationMs":270,"tenantId":"cmm3azdtj000hrthsz3wqn1z5","userId":"cmm3azdlm000grths7rhioqc8","userAgent":"node","ip":"127.0.0.1"}[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:45:40 PM [32m    LOG[39m [38;5;3m[HTTP] [39m[32m{"correlationId":"5440979e-95ef-478f-bbdd-6aa426a9b177","method":"GET","path":"/chains","statusCode":200,"durationMs":1094,"tenantId":"cmm3azdtj000hrthsz3wqn1z5","userId":"cmm3azdlm000grths7rhioqc8","userAgent":"node","ip":"127.0.0.1"}[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:45:41 PM [32m    LOG[39m [38;5;3m[HTTP] [39m[32m{"correlationId":"486d7ff7-15db-48a9-9378-fa0ad8e02c15","method":"GET","path":"/chains","statusCode":200,"durationMs":1102,"tenantId":"cmm3azdtj000hrthsz3wqn1z5","userId":"cmm3azdlm000grths7rhioqc8","userAgent":"node","ip":"127.0.0.1"}[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:45:43 PM [32m    LOG[39m [38;5;3m[HTTP] [39m[32m{"correlationId":"c7e43e0b-8266-4507-b3a7-0e047c445f3c","method":"GET","path":"/agents","statusCode":200,"durationMs":283,"tenantId":"cmm3azdtj000hrthsz3wqn1z5","userId":"cmm3azdlm000grths7rhioqc8","userAgent":"node","ip":"127.0.0.1"}[39m
+[32m[Nest] 71896  - [39m02/26/2026, 6:45:43 PM [32m    LOG[39m [38;5;3m[HTTP] [39m[32m{"correlationId":"6910f1b8-18f7-4764-87ad-3dc524c3b098","method":"GET","path":"/agents","statusCode":200,"durationMs":272,"tenantId":"cmm3azdtj000hrthsz3wqn1z5","userId":"cmm3azdlm000grths7rhioqc8","userAgent":"node","ip":"127.0.0.1"}[39m
+[31m[Nest] 71896  - [39m02/26/2026, 6:46:16 PM [31m  ERROR[39m [38;5;3m[LlmService] [39m[31m[LLM] Error calling model moonshotai/kimi-k2.5: Request timed out. (status: undefined, code: undefined)[39m
+[31m[Nest] 71896  - [39m02/26/2026, 6:46:16 PM [31m  ERROR[39m [38;5;3m[LlmService] [39m[31m[LLM] Error is not retryable or max attempts reached[39m
+[31m[Nest] 71896  - [39m02/26/2026, 6:46:16 PM [31m  ERROR[39m [38;5;3m[LlmService] [39m[31mLLM call failed after 3 attempts: Request timed out.[39m
+[31m[Nest] 71896  - [39m02/26/2026, 6:46:16 PM [31m  ERROR[39m [38;5;3m[ExceptionsHandler] [39m[31mRequest timed out.[39m
+Error: Request timed out.
+    at OpenAI.makeRequest (/Users/rishi/Documents/NexusOS/node_modules/.pnpm/openai@6.24.0_zod@3.25.76/node_modules/openai/src/client.ts:679:15)
+    at processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at runNextTicks (node:internal/process/task_queues:64:3)
+    at processTimers (node:internal/timers:516:9)
+    at async LlmService.complete (/Users/rishi/Documents/NexusOS/apps/api/src/ai/llm.service.ts:62:34)
+    at async LlmService.completeJSON (/Users/rishi/Documents/NexusOS/apps/api/src/ai/llm.service.ts:132:30)
+    at async AiController.chat (/Users/rishi/Documents/NexusOS/apps/api/src/ai/ai.controller.ts:97:34)
+[31m[Nest] 71896  - [39m02/26/2026, 6:46:16 PM [31m  ERROR[39m [38;5;3m[HTTP] [39m[31m{"correlationId":"1dc34cb9-d8dd-44ea-a1ed-0bfa715824f3","method":"POST","path":"/ai/chat","statusCode":500,"durationMs":93713,"tenantId":"cmm3azdtj000hrthsz3wqn1z5","userId":"cmm3azdlm000grths7rhioqc8","userAgent":"node","ip":"127.0.0.1"}[39m
+/Users/rishi/Documents/NexusOS/apps/api:
+ ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL  @nexus/api@0.1.0 dev: `ts-node --swc -r reflect-metadata -r dotenv/config src/main.ts dotenv_config_path=.env`
+Command failed with signal "SIGHUP"
+ ELIFECYCLE  Command failed.

@@ -1,40 +1,47 @@
+'use client';
+export const dynamic = 'force-dynamic';
 import { TopBar } from '../../components/ui/top-bar';
 import { ConnectorsGrid } from '../../components/connectors-grid';
+import { SyncHistoryTable } from '../../components/sync-history-table';
+import { clientApiFetch as apiFetch } from '../../lib/api-client';
 
 interface ConnectorStatus {
   id: string;
   provider: string;
   mode: string;
   lastSyncedAt: string | null;
+  syncStatus: string | null;
+  syncError: string | null;
+  eventCount: number;
   createdAt: string;
 }
 
+interface SyncJob {
+  id: string;
+  status: string;
+  provider: string;
+  createdAt: string;
+  error: string | null;
+}
+
 async function fetchConnectors(): Promise<ConnectorStatus[]> {
-  const baseUrl = process.env.API_BASE_URL ?? 'http://localhost:3000';
-  const tenantId = process.env.SINGLE_TENANT_ID ?? 'tenant_day1';
-  const authToken = process.env.AUTH_STATIC_TOKEN ?? 'day1-mvp-token';
-
   try {
-    // In a real implementation, we'd have a GET /connectors endpoint.
-    // For now we build a status view from what we know.
-    const response = await fetch(`${baseUrl}/connectors`, {
-      headers: {
-        Authorization: `Bearer ${authToken}`,
-        'x-tenant-id': tenantId,
-        'x-actor-id': 'web-connectors'
-      },
-      cache: 'no-store'
-    });
+    return await apiFetch<ConnectorStatus[]>('/connectors');
+  } catch {
+    return [];
+  }
+}
 
-    if (!response.ok) return [];
-    return (await response.json()) as ConnectorStatus[];
+async function fetchSyncJobs(): Promise<SyncJob[]> {
+  try {
+    return await apiFetch<SyncJob[]>('/connectors/sync-jobs');
   } catch {
     return [];
   }
 }
 
 export default async function ConnectorsPage(): Promise<JSX.Element> {
-  const connectors = await fetchConnectors();
+  const [connectors, syncJobs] = await Promise.all([fetchConnectors(), fetchSyncJobs()]);
 
   return (
     <>
@@ -44,6 +51,11 @@ export default async function ConnectorsPage(): Promise<JSX.Element> {
       />
       <div className="page-content">
         <ConnectorsGrid connectors={connectors} />
+
+        <div className="mt-8">
+          <h2 className="text-base font-semibold mb-3">Sync History</h2>
+          <SyncHistoryTable jobs={syncJobs} />
+        </div>
       </div>
     </>
   );

@@ -8,20 +8,27 @@ import {
 } from '@nestjs/common';
 import { TenantsService } from './tenants.service';
 import { requireTenantContext, TenantRequest } from '../common/tenant-request';
+import { IsEmail, IsIn, IsOptional, IsString } from 'class-validator';
 import { Roles } from '../auth/roles.decorator';
 
 class CreateTenantDto {
+  @IsString()
   name!: string;
 }
 
 class InviteMemberDto {
+  @IsEmail()
   email!: string;
+
+  @IsOptional()
+  @IsIn(['ADMIN', 'ANALYST', 'VIEWER'])
   role?: 'ADMIN' | 'ANALYST' | 'VIEWER';
 }
 
+
 @Controller('tenants')
 export class TenantsController {
-  constructor(private readonly tenantsService: TenantsService) {}
+  constructor(private readonly tenantsService: TenantsService) { }
 
   @Get('me')
   async getCurrentTenant(@Req() request: TenantRequest) {

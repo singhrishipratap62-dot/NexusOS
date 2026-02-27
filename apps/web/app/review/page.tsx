@@ -1,5 +1,8 @@
+'use client';
+export const dynamic = 'force-dynamic';
 import { TopBar } from '../../components/ui/top-bar';
 import { ReviewQueueTable } from '../../components/review-queue-table';
+import { clientApiFetch as apiFetch } from '../../lib/api-client';
 
 interface ReviewItem {
   id: string;
@@ -19,22 +22,8 @@ interface ReviewItem {
 }
 
 async function fetchReviewQueue(): Promise<ReviewItem[]> {
-  const baseUrl = process.env.API_BASE_URL ?? 'http://localhost:3000';
-  const tenantId = process.env.SINGLE_TENANT_ID ?? 'tenant_day1';
-  const authToken = process.env.AUTH_STATIC_TOKEN ?? 'day1-mvp-token';
-
   try {
-    const response = await fetch(`${baseUrl}/review-queue`, {
-      headers: {
-        Authorization: `Bearer ${authToken}`,
-        'x-tenant-id': tenantId,
-        'x-actor-id': 'web-review'
-      },
-      cache: 'no-store'
-    });
-
-    if (!response.ok) return [];
-    return (await response.json()) as ReviewItem[];
+    return await apiFetch<ReviewItem[]>('/review-queue');
   } catch {
     return [];
   }

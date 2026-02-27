@@ -1,38 +1,44 @@
 import { describe, expect, it, vi } from 'vitest';
 import { TenantMiddleware } from '../src/common/tenant.middleware';
 
-function buildRequest(headers: Record<string, string | undefined>): any {
-  return {
-    header: (name: string) => headers[name.toLowerCase()]
-  };
-}
-
 describe('TenantMiddleware', () => {
-  it('accepts matching single tenant and attaches context', () => {
-    process.env.SINGLE_TENANT_ID = 'tenant_day1';
+  it('accepts request with valid JWT-derived tenant context', () => {
     const middleware = new TenantMiddleware();
-    const request = buildRequest({
-      'x-tenant-id': 'tenant_day1',
-      'x-actor-id': 'analyst-1'
-    });
+    const request: any = {
+      header: () => undefined,
+      tenantContext: {
+        tenantId: 'tenant_abc',
+        actorId: 'user_1',
+        role: 'ADMIN'
+      }
+    };
 
     const next = vi.fn();
     middleware.use(request, {} as never, next);
 
     expect(next).toHaveBeenCalledTimes(1);
-    expect(request.tenantContext).toEqual({
-      tenantId: 'tenant_day1',
-      actorId: 'analyst-1'
-    });
   });
 
-  it('rejects non-matching tenant id', () => {
-    process.env.SINGLE_TENANT_ID = 'tenant_day1';
+  it('rejects request without tenant context', () => {
     const middleware = new TenantMiddleware();
-    const request = buildRequest({
-      'x-tenant-id': 'tenant_other'
-    });
+    const request: any = {
+      header: () => undefined
+    };
 
-    expect(() => middleware.use(request, {} as never, vi.fn())).toThrowError();
+    expect(() => middleware.use(request, {} as never, vi.fn())).toThrowError(
+      'Tenant context missing'
+    );
+  });
+
+  it('rejects request with empty tenantId', () => {
+    const middleware = new TenantMiddleware();
+    const request: any = {
+      header: () => undefined,
+      tenantContext: { tenantId: '', actorId: 'user_1' }
+    };
+
+    expect(() => middleware.use(request, {} as never, vi.fn())).toThrowError(
+      'Tenant context missing'
+    );
   });
 });

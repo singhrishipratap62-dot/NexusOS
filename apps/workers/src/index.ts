@@ -17,6 +17,7 @@ import {
   loadSlackAuditFixtures,
   normalizeRawConnectorEvent,
   QUEUE_NAMES,
+  encryptToken,
   safeDecryptToken,
   SlackReadOnlyCheckpoint,
   SlackReadOnlyConnector,
@@ -29,7 +30,10 @@ import { processSyncConnectorJob } from './sync/process-sync-job';
 const prisma = new PrismaClient();
 const redisUrl = process.env.REDIS_URL ?? 'redis://localhost:6379';
 const connection: any = new IORedis(redisUrl, {
-  maxRetriesPerRequest: null
+  maxRetriesPerRequest: null,
+  retryStrategy: (times) => {
+    return Math.min(times * 50, 2000);
+  }
 });
 
 const ingestionQueue = new Queue(QUEUE_NAMES.ingestion, { connection: connection as never });
@@ -62,7 +66,7 @@ async function ensureTenant(tenantId: string): Promise<void> {
 async function ensureConnector(
   tenantId: string,
   provider: Provider
-): Promise<{ id: string; accessToken: string | null; checkpoint: Prisma.JsonValue | null }> {
+): Promise<{ id: string; accessToken: string | null; refreshToken: string | null; checkpoint: Prisma.JsonValue | null }> {
   return prisma.connector.upsert({
     where: {
       tenantId_provider: {
@@ -81,6 +85,7 @@ async function ensureConnector(
     select: {
       id: true,
       accessToken: true,
+      refreshToken: true,
       checkpoint: true
     }
   });
@@ -196,6 +201,7 @@ async function ingestGmailConnectorEvents(input: {
   tenantId: string;
   connectorId: string;
   accessToken: string;
+  refreshToken?: string;
   checkpoint: Prisma.JsonValue | null;
 }): Promise<{
   inserted: number;
@@ -210,7 +216,16 @@ async function ingestGmailConnectorEvents(input: {
 
   const connector = new GmailReadOnlyConnector(input.accessToken, {
     maxRetries: Number(process.env.GMAIL_MAX_RETRIES ?? 4),
-    initialBackoffMs: Number(process.env.GMAIL_BACKOFF_MS ?? 350)
+    initialBackoffMs: Number(process.env.GMAIL_BACKOFF_MS ?? 350),
+    refreshToken: input.refreshToken,
+    clientId: process.env.GMAIL_CLIENT_ID ?? process.env.GOOGLE_CLIENT_ID,
+    clientSecret: process.env.GMAIL_CLIENT_SECRET ?? process.env.GOOGLE_CLIENT_SECRET,
+    onTokenRefresh: async (newToken: string) => {
+      await prisma.connector.update({
+        where: { id: input.connectorId },
+        data: { accessToken: encryptToken(newToken) }
+      });
+    }
   });
 
   let inserted = 0;

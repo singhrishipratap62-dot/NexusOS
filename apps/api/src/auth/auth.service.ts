@@ -1,4 +1,4 @@
-import { ConflictException, Injectable, UnauthorizedException } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import * as bcrypt from 'bcryptjs';
 import { PrismaService } from '../prisma/prisma.service';
 import { JwtTokenService } from './jwt-token.service';
@@ -8,7 +8,7 @@ export class AuthService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly jwtTokenService: JwtTokenService
-  ) {}
+  ) { }
 
   async register(email: string, password: string, name?: string) {
     const existing = await this.prisma.user.findUnique({ where: { email } });
@@ -77,5 +77,27 @@ export class AuthService {
 
   async logout(refreshToken: string) {
     await this.jwtTokenService.revokeRefreshToken(refreshToken);
+  }
+
+  async getProfile(userId: string, tenantId: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { id: true, email: true, name: true }
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const membership = await this.prisma.tenantMember.findUnique({
+      where: { tenantId_userId: { tenantId, userId } },
+      include: { tenant: { select: { id: true, name: true } } }
+    });
+
+    return {
+      user,
+      tenant: membership?.tenant ?? null,
+      role: membership?.role ?? null
+    };
   }
 }

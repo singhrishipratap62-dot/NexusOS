@@ -5,7 +5,7 @@
   "scripts": {
     "pretest": "pnpm --filter @nexus/contracts build && pnpm --filter @nexus/shared build",
     "prebuild": "pnpm --filter @nexus/contracts build && pnpm --filter @nexus/shared build",
-    "dev": "ts-node --swc -r reflect-metadata src/main.ts",
+    "dev": "ts-node --swc -r reflect-metadata -r dotenv/config src/main.ts dotenv_config_path=.env",
     "build": "tsc -p tsconfig.json",
     "start": "node dist/main.js",
     "lint": "echo 'No lint configured for api'",
@@ -16,6 +16,7 @@
     "seed": "tsx prisma/seed.ts"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.78.0",
     "@nestjs/common": "^10.4.15",
     "@nestjs/core": "^10.4.15",
     "@nestjs/jwt": "^11.0.2",
@@ -29,8 +30,10 @@
     "bullmq": "^5.41.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
+    "groq-sdk": "^0.37.0",
     "ioredis": "^5.4.2",
     "jose": "^6.1.3",
+    "openai": "^6.24.0",
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",
     "reflect-metadata": "^0.2.2",

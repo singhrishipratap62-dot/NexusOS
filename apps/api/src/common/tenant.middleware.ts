@@ -1,23 +1,17 @@
 import { ForbiddenException, Injectable, NestMiddleware } from '@nestjs/common';
 import { TenantRequest } from './tenant-request';
 
+/**
+ * Legacy TenantMiddleware — kept for reference but no longer applied.
+ * Tenant context is now derived from JWT claims via JwtAuthGuard (APP_GUARD).
+ * If re-enabled, this validates that the JWT-derived tenant context is present.
+ */
 @Injectable()
 export class TenantMiddleware implements NestMiddleware {
-  private readonly singleTenantId = process.env.SINGLE_TENANT_ID ?? 'tenant_day1';
-
   use(request: TenantRequest, _response: unknown, next: () => void): void {
-    const tenantIdHeader = request.header('x-tenant-id');
-
-    if (!tenantIdHeader || tenantIdHeader !== this.singleTenantId) {
-      throw new ForbiddenException(`Only tenant ${this.singleTenantId} is allowed`);
+    if (!request.tenantContext?.tenantId) {
+      throw new ForbiddenException('Tenant context missing — JWT authentication required');
     }
-
-    const actorId = request.tenantContext?.actorId ?? request.header('x-actor-id') ?? 'system-user';
-
-    request.tenantContext = {
-      tenantId: tenantIdHeader,
-      actorId
-    };
 
     next();
   }

@@ -117,6 +117,8 @@ export interface WarRoomOpportunity {
   paybackMonths: number | null;
   roiScore: number;
   workflowConfidence: number;
+  monthlyRuns: number;
+  avgMinutesPerRun: number;
   recommendationStatus: RecommendationStatus;
   reviewStatus: ReviewStatus;
 }
@@ -170,6 +172,15 @@ export interface AutomationBlueprint {
   triggerConfig: Record<string, any> | null;
   steps: AutomationStep[];
   dryRun: boolean;
+  autoExecute?: boolean;
+  confidenceThreshold?: number;
+  aiGenerated?: boolean;
+  aiReasoning?: string | null;
+  persona?: string | null;
+  avatarUrl?: string | null;
+  jobTitle?: string | null;
+  department?: string | null;
+  manager?: string | null;
   createdById: string;
   createdAt: Date;
   updatedAt: Date;

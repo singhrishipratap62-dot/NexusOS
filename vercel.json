@@ -1,0 +1,8 @@
+{
+    "version": 2,
+    "buildCommand": "pnpm --filter @nexus/contracts build && pnpm --filter @nexus/shared build && pnpm --filter @nexus/web build",
+    "installCommand": "pnpm install",
+    "framework": "nextjs",
+    "outputDirectory": "apps/web/.next",
+    "ignoreCommand": "git diff --quiet HEAD^ HEAD ./"
+}
